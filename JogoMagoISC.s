@@ -5,21 +5,25 @@
 .include "mago.data"
 .include "colisao.s"
 .include "jogador.s"
+.include "inimigos.s"
 .data
 
-base_frame_A:    .word 0xFF000000
-cd_frame_A:      .word 0
-posicao_y_mago:  .word 20
-posicao_x_mago:  .word 24
-tamanho_mago:    .word 24
-tempo_inicio:    .word 0
-tempo_final:     .word 0
+#Variaveis de memoria salva
+base_frame_A:    .word 0xFF000000 #Endereço de memoria do frame atual s0
+cd_frame_A:      .word 0 #Codigo do frame atual (0 ou 1) s6
+posicao_y_mago:  .word 20 # s1
+posicao_x_mago:  .word 24 # s2
+tamanho_mago:    .word 24 # s3
+tempo_inicio:    .word 0 # s3
+tempo_final:     .word 0 # s3
 
 .text
 
+# Constantes de vídeo
 .eqv VGA_BASE      0xFF000000
 .eqv VGA_END       0xFF012C00
 .eqv VGA_FRAME_SEL 0xFF200604
+.eqv TECLA         0xff200004 # endereço do teclado
 .eqv FRAME_TARGET_MS 40
 
 .globl main
@@ -31,6 +35,7 @@ main:
     la t0, inimigos
     li t1, MAX_INIMIGOS
     li t2, TAM_INIMIGO
+
 init_inimigos:
     beqz t1, init_inimigos_fim
     sw zero, 0(t0)
@@ -39,9 +44,13 @@ init_inimigos:
     add t0, t0, t2
     addi t1, t1, -1
     j init_inimigos
+
 init_inimigos_fim:
 
+    jal spawn_inimigos
+
     jal draw_image
+    jal draw_inimigos
     jal draw_square
     jal draw_hearts
     jal draw_mana_bar
@@ -49,13 +58,12 @@ init_inimigos_fim:
 loop:
     li a7, 30
     ecall
-    mv t1, a0
     la t0, tempo_inicio
-    sw t1, 0(t0)
+    sw a0, 0(t0)
 
     jal read_key
 
-    li t0, 'p'
+    li t0, 27
     beq a0, t0, exit_program
     li t0, 'w'
     beq a0, t0, move_up
@@ -70,33 +78,33 @@ loop:
 move_up:
     la t0, posicao_y_mago
     lw s2, 0(t0)
-    addi t0, s2, -8
+    addi t0, s2, -18 # Limite superior do mapa
     bltz t0, after_move
-    addi s2, s2, -2
+    addi s2, s2, -4
     j after_move
 
 move_left:
     la t0, posicao_x_mago
     lw s1, 0(t0)
-    addi t0, s1, -8
+    addi t0, s1, -18 # Limite esquerdo do mapa
     bltz t0, after_move
-    addi s1, s1, -2
+    addi s1, s1, -4
     j after_move
 
 move_down:
     la t0, posicao_y_mago
     lw s2, 0(t0)
-    li t0, 208
+    li t0, 192       # Limite inferior do mapa
     bgt s2, t0, after_move
-    addi s2, s2, 2
+    addi s2, s2, 4
     j after_move
 
 move_right:
     la t0, posicao_x_mago
     lw s1, 0(t0)
-    li t0, 288
+    li t0, 270       # Limite direito do mapa
     bgt s1, t0, after_move
-    addi s1, s1, 2
+    addi s1, s1, 4
     j after_move
 
 after_move:
@@ -106,7 +114,11 @@ after_move:
     sw s2, 0(t0)
 
     jal checar_colisao_mago_inimigos
+    jal atualiza_inimigos
 
+    li a0, 0
+    li t0, TECLA
+    sw a0, 0(t0)
     la t0, cd_frame_A
     lw s6, 0(t0)
     beqz s6, frame0
@@ -125,6 +137,7 @@ frame1:
 
 draw_frame:
     jal draw_image
+    jal draw_inimigos
     jal draw_square
     jal draw_hearts
     jal draw_mana_bar
@@ -153,8 +166,7 @@ exit_program:
     ecall
 
 read_key:
-    li t0, 0xff200000
-    lb a0, 4(t0)
+    lw a0, TECLA  # endereço do teclado
     ret
 
 # Copia o mapa da memória pra tela

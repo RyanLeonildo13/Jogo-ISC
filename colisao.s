@@ -1,9 +1,9 @@
 .data
 .eqv MAX_INIMIGOS   8
-.eqv TAM_INIMIGO    12   # bytes por inimigo (x, y, ativo)
-.eqv TAM_PX_INIMIGO 16   # largura/altura do inimigo em pixels
+.eqv TAM_INIMIGO    20   # bytes por inimigo (x, y, ativo, direcao, timer)
+.eqv TAM_PX_INIMIGO 32   # largura/altura do inimigo em pixels
 
-inimigos: .space 96      # MAX_INIMIGOS * TAM_INIMIGO
+inimigos: .space 160     # MAX_INIMIGOS * TAM_INIMIGO
 
 .text
 

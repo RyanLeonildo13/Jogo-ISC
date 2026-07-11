@@ -222,6 +222,9 @@ game_over:
     ret
 
 reinicia_rodada:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
     la t0, mago_spawn_x
     lw t1, 0(t0)
     la t0, posicao_x_mago
@@ -242,4 +245,8 @@ matar_loop:
     addi t1, t1, -1
     j matar_loop
 matar_fim:
+    jal spawn_inimigos
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
     ret
