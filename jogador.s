@@ -209,6 +209,9 @@ mago_atingido:
 
     blez t1, game_over
 
+    li a0, 1000
+    jal sleep_ms
+
     jal reinicia_rodada
 
     lw ra, 0(sp)
@@ -216,10 +219,49 @@ mago_atingido:
     ret
 
 game_over:
-    # AJUSTAR: chamar aqui a tela/rotina de game over
     lw ra, 0(sp)
     addi sp, sp, 4
-    ret
+
+    li a0, 1000
+    jal sleep_ms
+
+# Desenha a tela de game over (gameover.data) e espera o jogador escolher:
+#  ESPACO/ESC = sair    |    R = reiniciar o jogo do zero
+draw_over:
+    la t0, base_frame_A
+    lw s0, 0(t0)
+    la t0, gameover
+    mv t1, s0
+    li t6, 76800
+    add t2, s0, t6
+over_loop:
+    beq t1, t2, over_done
+    lb t3, 8(t0)
+    sb t3, 0(t1)
+    addi t0, t0, 1
+    addi t1, t1, 1
+    j over_loop
+over_done:
+    li t0, 0xff200004       # endereco do teclado (descarta tecla fantasma)
+    sw zero, 0(t0)
+
+over_wait:
+    jal read_key
+    li t0, 'r'
+    beq a0, t0, over_restart
+    li t0, ' '
+    beq a0, t0, over_exit
+    li t0, 27
+    beq a0, t0, over_exit
+    j over_wait
+
+over_restart:
+    li t0, 0xff200004        # endereco do teclado (consome a tecla usada na escolha)
+    sw zero, 0(t0)
+    j main                   # reinicia o jogo do zero (fase 1, vida cheia, etc)
+
+over_exit:
+    j exit_program
 
 reinicia_rodada:
     addi sp, sp, -4

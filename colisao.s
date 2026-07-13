@@ -69,6 +69,7 @@ colisao_loop:
     jal check_collision
     beqz a0, colisao_next
 
+    jal tocar_som_goblin_ataca
     jal mago_atingido
     j colisao_fim
 
