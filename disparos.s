@@ -3,7 +3,7 @@
 # - Tecla ESPACO cria um disparo na direcao do ultimo movimento (WASD)  #
 # - Ate MAX_DISPAROS na tela ao mesmo tempo                             #
 # - Ao acertar um inimigo, o inimigo desaparece e o disparo some        #
-# - Textura em disparo.data (placeholder branco 10x10, trocavel depois) #
+# - Textura em powershot1.data (orbe 10x10; label "disparo:")               #
 #########################################################################
 
 .data
@@ -33,12 +33,9 @@ dir_y_mago: .word -1
 # spawn_disparo
 # Cria um disparo num slot livre, centralizado no mago, com velocidade
 # na direcao de mira atual. Se nao houver slot livre, nao faz nada.
-# Toca o som do disparo quando criado com sucesso.
+# Rotina folha: usa apenas t0-t6, preservando todos os registradores s.
 #########################################################################
 spawn_disparo:
-    addi sp, sp, -4
-    sw   ra, 0(sp)
-
     # procura um slot livre (ativo == 0)
     la   t0, disparos
     li   t1, MAX_DISPAROS
@@ -79,11 +76,7 @@ spawn_disp_achou:
     li   t6, 1
     sw   t6, 8(t0)                  # marca como ativo
 
-    jal  tocar_som_disparo
-
 spawn_disp_fim:
-    lw   ra, 0(sp)
-    addi sp, sp, 4
     ret
 
 #########################################################################
@@ -152,10 +145,12 @@ atualiza_disp_col:
     jal  check_collision
     beqz a0, atualiza_disp_col_next
 
-    # acertou: inimigo desaparece e o disparo some
-    sw   zero, 8(s3)                # inimigo inativo
+    # acertou: concede mana + tenta dropar powerup, depois some com ambos
+    mv   a0, s3                    # ponteiro do inimigo
+    jal  ao_matar_inimigo
+    mv   a0, s3                    # ponteiro do inimigo
+    jal  mata_inimigo
     sw   zero, 8(s1)                # disparo inativo
-    jal  tocar_som_goblin_morre
     j    atualiza_disp_next
 
 atualiza_disp_col_next:
