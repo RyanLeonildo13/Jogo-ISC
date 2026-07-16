@@ -1,47 +1,49 @@
+# Registradores principais do jogo: s0 guarda o endereço do frame; s1 e s2, y e x do mago.
+# s3 mantém o tamanho do sprite e s6 identifica o frame exibido. t0-t6 são temporários do laço.
 .include "MACROSv24.s"
 
-# Ponto de entrada (RARS e FPGRARS): primeira instrucao do .text.
-# Evita depender de .globl main, que o FPGRARS nao suporta.
+# Ponto de entrada (RARS e FPGRARS): primeira instrução do .text.
+# Evita depender de .globl main, que o FPGRARS não suporta.
 .text
     j main
 
 .data
-.include "magomenu.data"
-.include "pausemenu.data"
+.include "Mecanicas/magomenu.data"
+.include "Mecanicas/pausemenu.data"
 .include "tela.data"
-.include "vitoria.data"
-.include "gameover.data"
-.include "mago.data"
-.include "colisao.s"
-.include "jogador.s"
-.include "inimigos.s"
-.include "disparos.s"
-.include "audio.s"
-.include "poderes.s"
+.include "Mecanicas/vitoria.data"
+.include "Mecanicas/gameover.data"
+.include "Mecanicas/mago.data"
+.include "Mecanicas/colisao.s"
+.include "Mecanicas/jogador.s"
+.include "Inimigos/inimigos.s"
+.include "Mecanicas/disparos.s"
+.include "Audio/audio.s"
+.include "Mecanicas/poderes.s"
 .data
 
-#Variaveis de memoria salva
-base_frame_A:    .word 0xFF000000 #Endereco de memoria do frame atual s0
-cd_frame_A:      .word 0 #Codigo do frame atual (0 ou 1) s6
-posicao_y_mago:  .word 20 # s1
-posicao_x_mago:  .word 24 # s2
-tamanho_mago:    .word 24 # s3
-tempo_inicio:    .word 0 # s3
-tempo_final:     .word 0 # s3
-map_adress:      .word 0 # endereco do mapa atual
+# Variáveis que precisam continuar disponíveis durante toda a partida.
+base_frame_A:    .word 0xFF000000    # s0 recebe daqui o endereço do frame em uso.
+cd_frame_A:      .word 0    # s6 recebe 0 ou 1 para identificar o frame atual.
+posicao_y_mago:  .word 20    # Guarda a coordenada vertical do mago.
+posicao_x_mago:  .word 24    # Guarda a coordenada horizontal do mago.
+tamanho_mago:    .word 24    # Largura e altura do sprite, ambas com 24 pixels.
+tempo_inicio:    .word 0    # Instante registrado no começo da medição de tempo.
+tempo_final:     .word 0    # Instante registrado ao final da medição de tempo.
+map_adress:      .word 0    # Ponteiro para os pixels do mapa carregado.
 nivel_atual:     .word 0
 mago_disparou:   .word 0
-pular_menu:      .word 0  # 1 = ao entrar em init_mago, nao mostra o menu (usado por next_level)
+pular_menu:      .word 0    # 1 = ao entrar em init_mago, não mostra o menu (usado por next_level)
 
-# a =0, s = 1, ap =2, d = 3, dp = 4,
+# A =0, s = 1, ap =2, d = 3, dp = 4,
 
 .text
 
-# Constantes de video
+# Constantes de vídeo
 .eqv VGA_BASE      0xFF000000
 .eqv VGA_END       0xFF012C00
 .eqv VGA_FRAME_SEL 0xFF200604
-.eqv TECLA         0xff200004 # endereco do teclado
+.eqv TECLA         0xff200004    # Endereço do teclado.
 .eqv FRAME_TARGET_MS 30
 
 main:
@@ -59,11 +61,13 @@ init_mago:
     la t0, mana_atual
     li t1, 65
     sw t1, 0(t0)
-    la t0, posicao_x_mago
-    li t1, 24
+    la t0, mago_spawn_x 
+    lw t1, 0(t0)
+    la t0,  posicao_x_mago
     sw t1, 0(t0)
-    la t0, posicao_y_mago
-    li t1, 20
+    la t0, mago_spawn_y
+    lw t1, 0(t0)
+    la t0,  posicao_y_mago
     sw t1, 0(t0)
 
     la t0, inimigos_mortos
@@ -90,12 +94,12 @@ init_disparos:
     li t2, TAM_DISPARO
 init_disparos_loop:
     beqz t1, init_disparos_fim
-    sw zero, 8(t0)          # marca o slot como livre
+    sw zero, 8(t0)    # Marca o slot como livre.
     add t0, t0, t2
     addi t1, t1, -1
     j init_disparos_loop
 init_disparos_fim:
-    la t0, dir_x_mago       # mira inicial: para cima
+    la t0, dir_x_mago    # Mira inicial: para cima.
     sw zero, 0(t0)
     la t0, dir_y_mago
     li t1, -1
@@ -105,33 +109,35 @@ init_disparos_fim:
 
     la t0, pular_menu
     lw t1, 0(t0)
-    bnez t1, pula_intro_menu   # veio de next_level: nao mostra o menu de novo
+    bnez t1, pula_intro_menu    # Veio de next_level: não mostra o menu de novo.
 
     jal draw_menu
-    jal tocar_musica_menu  # toca em loop ate ESPACO ser pressionado
+    jal tocar_musica_menu    # Toca em loop até ESPAÇO ser pressionado.
 
-    li t0, TECLA           # consome o ESPACO do menu (evita disparo fantasma)
+    li t0, TECLA    # Consome o ESPAÇO do menu (evita disparo fantasma)
     sw zero, 0(t0)
     j intro_menu_fim
 
 pula_intro_menu:
     la t0, pular_menu
-    sw zero, 0(t0)         # consome a flag
+    sw zero, 0(t0)    # Consome a flag.
 intro_menu_fim:
 
     jal spawn_inimigos
+    jal init_chefe
 
     jal draw_image
     jal draw_inimigos
     jal draw_square
     jal draw_escudo_aura
+    jal draw_chefe
     jal draw_disparos
     jal draw_superdisparos
     jal draw_powerups
     jal draw_hearts
     jal draw_mana_bar
 
-#Pausa no inicio da fase
+# Pausa no início da fase
     li a0, 1000
     jal sleep_ms
 
@@ -167,20 +173,26 @@ shoot:
     li t1, 10
     la t0, mago_disparou   
     sw t1, 0(t0)
-    la t0, triplo_timer     # tiro triplo ativo?
+    la t0, triplo_timer    # Tiro triplo ativo?
     lw t0, 0(t0)
     bgtz t0, shoot_triplo
     jal spawn_disparo
     jal tocar_som_disparo
     j after_move
 shoot_triplo:
+    li t1, 10
+    la t0, mago_disparou   
+    sw t1, 0(t0)
     jal spawn_tiro_triplo
     jal tocar_som_disparo
     j after_move
 
 super_shoot:
+    li t1, 30
+    la t0, mago_disparou   
+    sw t1, 0(t0)
     jal spawn_superdisparo
-    beqz a0, after_move     # nao tinha mana cheia: nao disparou, sem som
+    beqz a0, after_move    # Não tinha mana cheia: não disparou, sem som.
     jal tocar_som_disparo
     j after_move
 
@@ -223,65 +235,74 @@ next_level:
     li t0, 3
     beq t0, t1, venceu
 
-    la t0, pular_menu       # avanco de fase: nao mostra o menu inicial de novo
+    la t0, pular_menu    # Avanco de fase: não mostra o menu inicial de novo.
     li t1, 1
     sw t1, 0(t0)
 
     j init_mago
 
 move_up:
-    la t0, dir_x_mago      # mira para cima (0,-1)
+    la t0, dir_x_mago    # Mira para cima (0,-1)
     sw zero, 0(t0)
     la t0, dir_y_mago
     li t1, -1
     sw t1, 0(t0)
     la t0, posicao_y_mago
     lw s2, 0(t0)
-    addi t0, s2, -18 # Limite superior do mapa
+    addi t0, s2, -18    # Limite superior do mapa.
     bltz t0, after_move
     addi s2, s2, -4
     j after_move
 
 move_left:
-    la t0, dir_x_mago      # mira para a esquerda (-1,0)
+    la t0, dir_x_mago    # Mira para a esquerda (-1,0)
     li t1, -1
     sw t1, 0(t0)
     la t0, dir_y_mago
     sw zero, 0(t0)
     la t0, posicao_x_mago
     lw s1, 0(t0)
-    addi t0, s1, -18 # Limite esquerdo do mapa
+    addi t0, s1, -18    # Limite esquerdo do mapa.
     bltz t0, after_move
     addi s1, s1, -4
     j after_move
 
 move_down:
-    la t0, dir_x_mago      # mira para baixo (0,1)
+    la t0, dir_x_mago    # Mira para baixo (0,1)
     sw zero, 0(t0)
     la t0, dir_y_mago
     li t1, 1
     sw t1, 0(t0)
     la t0, posicao_y_mago
     lw s2, 0(t0)
-    li t0, 192       # Limite inferior do mapa
+    li t0, 192    # Limite inferior do mapa.
     bgt s2, t0, after_move
     addi s2, s2, 4
     j after_move
 
 move_right:
-    la t0, dir_x_mago      # mira para a direita (1,0)
+    la t0, dir_x_mago    # Mira para a direita (1,0)
     li t1, 1
     sw t1, 0(t0)
     la t0, dir_y_mago
     sw zero, 0(t0)
     la t0, posicao_x_mago
     lw s1, 0(t0)
-    li t0, 270       # Limite direito do mapa
+    li t0, 270    # Limite direito do mapa.
     bgt s1, t0, after_move
     addi s1, s1, 4
     j after_move
 
 after_move:
+    # Fase 3 (nível 2): mago preso a parte de baixo, abaixo do rio de lava
+    la t0, nivel_atual
+    lw t0, 0(t0)
+    li t1, 2
+    bne t0, t1, am_sem_trava
+    li t1, 140
+    bge s2, t1, am_sem_trava
+    li s2, 140
+am_sem_trava:
     la t0, posicao_x_mago
     sw s1, 0(t0)
     la t0, posicao_y_mago
@@ -295,18 +316,34 @@ after_move:
     jal atualiza_powerups
     jal map_colision1
 fim_after_move:
+    jal atualiza_chefe
 
-    # atingiu a meta de abates: zera o contador e passa de fase
+    # Fase 3 (nível 2): vitoria quando o chefe morre
+    la t0, nivel_atual
+    lw t0, 0(t0)
+    li t1, 2
+    bne t0, t1, checa_meta_comum
+    la t0, boss_hp
+    lw t0, 0(t0)
+    blez t0, vitoria_chefe
+    j checa_meta_fim
+checa_meta_comum:
+    # Atingiu a meta de abates: zera o contador e passa de fase
+    # meta por fase: fase 1 (nível 0) usa META_INIMIGOS_FASE, fase 2 usa META_INIMIGOS_FASE2
+    li t3, META_INIMIGOS_FASE
+    beqz t0, checa_meta_compara
+    li t3, META_INIMIGOS_FASE2
+checa_meta_compara:
     la t0, inimigos_mortos
     lw t1, 0(t0)
-    li t3, META_INIMIGOS_FASE
     bge t1, t3, next_level
+checa_meta_fim:
 
     li a0, 0
     li t0, TECLA
     sw a0, 0(t0)
 
-    la t0, game_over_flag   # morreu? mostra a tela de game over
+    la t0, game_over_flag    # Morreu? mostra a tela de game over.
     lw t0, 0(t0)
     bnez t0, tela_game_over
 
@@ -331,6 +368,7 @@ draw_frame:
     jal draw_inimigos
     jal draw_square
     jal draw_escudo_aura
+    jal draw_chefe
     jal draw_disparos
     jal draw_superdisparos
     jal draw_powerups
@@ -354,7 +392,7 @@ no_sleep:
     j loop
 
 resume_game:
-    li t0, TECLA           # consome a tecla usada no pause
+    li t0, TECLA    # Consome a tecla usada no pause.
     sw zero, 0(t0)
     j loop
     
@@ -372,10 +410,10 @@ sleep_loop:
 
 read_key:
     li t0, TECLA
-    lw a0, 0(t0)  # endereço do teclado
+    lw a0, 0(t0)    # Endereço do teclado.
     ret
 
-# Copia o mapa da memória pra tela
+# Copia o mapa da memória para tela
 draw_image:
     la t0, base_frame_A
     lw s0, 0(t0)
@@ -394,7 +432,7 @@ image_loop:
 image_done:
     ret
     
-# Copia o menu da memória pra tela
+# Copia o menu da memória para tela
 draw_menu:
     la t0, base_frame_A
     lw s0, 0(t0)
@@ -524,45 +562,52 @@ frameM0:
     addi t2, t2, 8
     j draw_square1
 frameM1:
-    li t0, 584     # 24*24 + 8 = 584
+    li t0, 584    # 24*24 + 8 = 584.
     add t2, t2, t0
     j draw_square1
 frameM2:
-    li t0, 1160     # 24*24*2 + 8 = 584
+    li t0, 1160    # 24*24*2 + 8 = 584.
     add t2, t2, t0
     j draw_square1
 frameM3:
     la t2, mago
-    li t0, 1736     # 24*24*3 + 8 = 584
+    li t0, 1736    # 24*24*3 + 8 = 584.
     add t2, t2, t0
     j draw_square1
 frameM4:
-    li t0, 2312     # 24*24*4 + 8 = 584
+    li t0, 2312    # 24*24*4 + 8 = 584.
     add t2, t2, t0
     j draw_square1
 frameM5:
-    li t0, 2888     # 24*24*5 + 8 = 584
+    li t0, 2888    # 24*24*5 + 8 = 584.
     add t2, t2, t0
     j draw_square1
 frameM6:
-    li t0, 3464     # 24*24*6 + 8 = 584
+    li t0, 3464    # 24*24*6 + 8 = 584.
     add t2, t2, t0
     j draw_square1
 
-#########################################################################
+# -----------------------------------------------------------------------------
 # Tela de game over: desenha gameover.data no frame 0 e espera tecla.
-#   R ou ESPACO -> reinicia (volta ao menu) ; ESC -> sai
-#########################################################################
+# R ou ESPAÇO -> reinicia (volta ao menu) ; ESC -> sai
+# -----------------------------------------------------------------------------
 tela_game_over:
-    li t0, VGA_FRAME_SEL       # mostra o frame 0
+    li t0, VGA_FRAME_SEL    # Mostra o frame 0.
     sw zero, 0(t0)
-    li s0, VGA_BASE            # desenha no frame 0
+    li s0, VGA_BASE    # Desenha no frame 0.
     la t0, base_frame_A
     sw s0, 0(t0)
     jal draw_gameover
 
-    li t0, TECLA               # limpa tecla residual
+    li t0, TECLA    # Limpa tecla residual.
     sw zero, 0(t0)
+
+    la t0, nivel_atual
+    sw zero, 0(t0)
+
+    la t0, map_pixels
+    la t1, map_adress
+    sw t0, 0(t1)
 
 go_espera:
     jal read_key
@@ -575,11 +620,11 @@ go_espera:
     j go_espera
 
 go_reinicia:
-    li t0, TECLA               # consome a tecla usada
+    li t0, TECLA    # Consome a tecla usada.
     sw zero, 0(t0)
     j init_mago
 
-# Copia a tela de game over (gameover.data, 320x240) pro frame atual
+# Copia a tela de game over (gameover.data, 320x240) para o frame atual
 draw_gameover:
     la t0, base_frame_A
     lw s0, 0(t0)
@@ -614,3 +659,54 @@ venceu_loop:
 venceu_done:
 jal tocar_musica_menu
 j exit_program
+
+# -----------------------------------------------------------------------------
+# vitoria_chefe - fim da fase 3: animacao do mago (positivo, como no fim
+# das fases 1 e 2), depois a tela vitoria.data; ESPAÇO volta ao menu.
+# -----------------------------------------------------------------------------
+vitoria_chefe:
+    li t0, VGA_FRAME_SEL    # Mostra o frame 0.
+    sw zero, 0(t0)
+    li t1, VGA_BASE    # Desenha no frame 0.
+    la t0, base_frame_A
+    sw t1, 0(t0)
+    jal draw_image    # Mapa da fase 3.
+    jal frameM3    # Mago fazendo o positivo.
+    li a0, 3000
+    jal sleep_ms
+    jal desenha_vitoria    # Tela de vitoria.
+    li t0, TECLA
+    sw zero, 0(t0)
+vch_espera:
+    jal read_key
+    li t0, ' '    # ESPAÇO volta ao menu.
+    beq a0, t0, vch_menu
+    j vch_espera
+vch_menu:
+    la t0, nivel_atual    # Reinicia do zero e volta ao menu.
+    sw zero, 0(t0)
+    la t0, pular_menu
+    sw zero, 0(t0)
+    li t0, TECLA
+    sw zero, 0(t0)
+    j main
+
+# Desenha_vitoria - copia vitoria.data para o frame atual
+desenha_vitoria:
+    la t0, base_frame_A
+    lw s0, 0(t0)
+    la t0, vitoria
+    mv t1, s0
+    li t6, 76800
+    add t2, s0, t6
+dvit_loop:
+    beq t1, t2, dvit_done
+    lb t3, 8(t0)
+    sb t3, 0(t1)
+    addi t0, t0, 1
+    addi t1, t1, 1
+    j dvit_loop
+dvit_done:
+    ret
+
+.include "Inimigos/chefe.s"

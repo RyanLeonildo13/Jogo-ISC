@@ -1,112 +1,97 @@
+# Durante os laços, os registradores s guardam o inimigo atual, os limites e os contadores.
+# a0-a2 transportam parâmetros e retornos; t0-t6 ficam com cálculos que não precisam ser preservados.
 .data
 .include "vilao.data"
 .include "eyeofrah.data"
 
 .eqv OGRE_INTERVALO 5
-.eqv OGRE_SPAWN_INTERVALO 60
+.eqv SPAWN_INTERVALO 30    # Frames entre nascimentos graduais (mais frequente)
+.eqv INIMIGOS_POR_FASE 4    # Quantos do tipo da fase ficam em campo ao mesmo tempo.
 .eqv OLHO_INTERVALO 3
-.eqv OGRE_DIST_MIN 80
-.eqv META_INIMIGOS_FASE 20
-.eqv MAX_OGROS_FASE2 1
-.eqv MAX_OLHOS_FASE2 4
+.eqv OGRE_DIST_MIN 140    # Mantém o nascimento longe do mago, mesmo com reposição mais rápida.
+.eqv META_INIMIGOS_FASE 20    # Meta de abates na fase 1.
+.eqv META_INIMIGOS_FASE2 30    # Abates necessários na fase 2 para liberar o chefão.
 .eqv TIPO_OGRO 1
 .eqv TIPO_OLHO 2
 
 inimigos_mortos: .word 0
+ogro_anim_frame: .word 0    # 0/1 - alterna a cada passo, dando o efeito de caminhada.
 spawn_timer: .word 0
 
 .text
 
-# Fase 1 (nivel 0): um ogro e quatro olhos. Fase 2 (nivel 1): dois ogros.
-# Fase 3 fica reservada ao chefe e nao cria inimigos comuns.
+# Fase 1 (nível 0): só ogros. Fase 2 (nível 1): só olhos.
+# Fase 3 (chefe) não cria inimigos comuns.
 spawn_inimigos:
-    addi sp, sp, -4
-    sw ra, 0(sp)
+    addi sp, sp, -16
+    sw ra, 12(sp)
+    sw s1, 8(sp)
+    sw s2, 4(sp)
+    sw s3, 0(sp)
+
     la t0, nivel_atual
     lw t0, 0(t0)
-    beqz t0, spawn_fase1
     li t1, 1
-    beq t0, t1, spawn_fase2
-    j spawn_inimigos_fim
-spawn_fase1:
-    la a0, inimigos
-    li a1, TIPO_OGRO
+    li s2, TIPO_OGRO
+    beq t0, t1, spawn_ini_olho
+    li t1, 2
+    beq t0, t1, spawn_inimigos_fim    # Fase do chefe: não nasce nada.
+    j spawn_ini_vai
+spawn_ini_olho:
+    li s2, TIPO_OLHO
+spawn_ini_vai:
+    la s1, inimigos
+    li s3, INIMIGOS_POR_FASE    # Contador em registrador salvo (spawn_tipo usa t3 por dentro)
+spawn_ini_loop:
+    beqz s3, spawn_inimigos_fim
+    mv a0, s1
+    mv a1, s2
     jal spawn_tipo
-    la a0, inimigos
-    addi a0, a0, TAM_INIMIGO
-    li a1, TIPO_OLHO
-    jal spawn_tipo
-    la a0, inimigos
-    addi a0, a0, 48
-    li a1, TIPO_OLHO
-    jal spawn_tipo
-    la a0, inimigos
-    addi a0, a0, 72
-    li a1, TIPO_OLHO
-    jal spawn_tipo
-    la a0, inimigos
-    addi a0, a0, 96
-    li a1, TIPO_OLHO
-    jal spawn_tipo
-    j spawn_inimigos_fim
-spawn_fase2:
-    la a0, inimigos
-    li a1, TIPO_OGRO
-    jal spawn_tipo
-    la a0, inimigos
-    addi a0, a0, TAM_INIMIGO
-    li a1, TIPO_OGRO
-    jal spawn_tipo
+    addi s1, s1, TAM_INIMIGO
+    addi s3, s3, -1
+    j spawn_ini_loop
+
 spawn_inimigos_fim:
-    la t2, nivel_atual
-    lw t2, 0(t2)
-    li t3, 1
-    beq t2, t3, spawn_timer_ogro    # fase 2 (so ogros): timer rapido de ogro
-    li t0, 120                       # fase 1 (mista): timer mais lento
-    j spawn_timer_guarda
-spawn_timer_ogro:
-    li t0, OGRE_SPAWN_INTERVALO
-spawn_timer_guarda:
+    li t0, SPAWN_INTERVALO
     la t1, spawn_timer
     sw t0, 0(t1)
-    lw ra, 0(sp)
-    addi sp, sp, 4
+    lw ra, 12(sp)
+    lw s1, 8(sp)
+    lw s2, 4(sp)
+    lw s3, 0(sp)
+    addi sp, sp, 16
     ret
 
-# Reaparece gradualmente. Fase 1 (mista, ogro+olho): respeita os tetos por
-# tipo. Fase 2 (so ogros): reposicao simples, so ogro.
+# Reaparece gradualmente, sempre só do tipo da fase atual, até o teto
+# INIMIGOS_POR_FASE. Fase do chefe (nível 2) nunca nasce nada.
 atualiza_spawn_inimigos:
-    addi sp, sp, -12
-    sw ra, 8(sp)
-    sw s1, 4(sp)
-    sw s2, 0(sp)
+    addi sp, sp, -16
+    sw ra, 12(sp)
+    sw s1, 8(sp)
+    sw s2, 4(sp)
+    sw s3, 0(sp)
+
     la t0, nivel_atual
     lw t0, 0(t0)
     li t2, 2
     bge t0, t2, spawn_atualiza_fim
-    la t2, spawn_timer
-    lw t1, 0(t2)
-    addi t1, t1, -1
-    bgtz t1, spawn_guarda
-    li t2, 1
-    beq t0, t2, spawn_fase2_reposicao
-    li a0, TIPO_OGRO
-    jal conta_tipo
-    li t2, MAX_OGROS_FASE2
-    blt a0, t2, spawn_ogro_fase1
-    li a0, TIPO_OLHO
-    jal conta_tipo
-    li t2, MAX_OLHOS_FASE2
-    bge a0, t2, spawn_guarda
+
+    li s2, TIPO_OGRO
+    beqz t0, spawn_grad_tipo_ok
     li s2, TIPO_OLHO
-    j spawn_vaga
-spawn_fase2_reposicao:
-    li t1, OGRE_SPAWN_INTERVALO
-    li s2, TIPO_OGRO
-    j spawn_vaga
-spawn_ogro_fase1:
-    li s2, TIPO_OGRO
-spawn_vaga:
+spawn_grad_tipo_ok:
+
+    la t2, spawn_timer
+    lw s3, 0(t2)    # Guardado em registrador salvo: conta_tipo/spawn_tipo usam t1 por dentro.
+    addi s3, s3, -1
+    bgtz s3, spawn_guarda
+    li s3, SPAWN_INTERVALO
+
+    mv a0, s2
+    jal conta_tipo
+    li t2, INIMIGOS_POR_FASE
+    bge a0, t2, spawn_guarda    # Campo já cheio desse tipo, espera.
+
     la s1, inimigos
     li t2, MAX_INIMIGOS
 spawn_vaga_loop:
@@ -120,25 +105,19 @@ spawn_vaga_achou:
     mv a0, s1
     mv a1, s2
     jal spawn_tipo
-    la t0, nivel_atual
-    lw t0, 0(t0)
-    li t2, 1
-    beq t0, t2, spawn_rearma_fase2
-    li t1, 120
-    j spawn_guarda
-spawn_rearma_fase2:
-    li t1, OGRE_SPAWN_INTERVALO
+
 spawn_guarda:
     la t0, spawn_timer
-    sw t1, 0(t0)
+    sw s3, 0(t0)
 spawn_atualiza_fim:
-    lw ra, 8(sp)
-    lw s1, 4(sp)
-    lw s2, 0(sp)
-    addi sp, sp, 12
+    lw ra, 12(sp)
+    lw s1, 8(sp)
+    lw s2, 4(sp)
+    lw s3, 0(sp)
+    addi sp, sp, 16
     ret
 
-# a0=slot, a1=tipo. Sorteia posicao afastada do mago e ativa o registro.
+# a0 indica o slot e a1 informa o tipo. A rotina sorteia uma posição distante e ativa o registro.
 spawn_tipo:
     addi sp, sp, -16
     sw ra, 12(sp)
@@ -194,7 +173,7 @@ spawn_timer_ok:
     addi sp, sp, 16
     ret
 
-# a0=tipo; retorna a0=quantidade ativa.
+# a0 recebe o tipo procurado e, na volta, contém a quantidade ativa.
 conta_tipo:
     mv t3, a0
     la t0, inimigos
@@ -234,6 +213,10 @@ atualiza_loop:
     beq t1, t2, olho_move
     li t0, OGRE_INTERVALO
     li t5, TIPO_OGRO
+    la t2, ogro_anim_frame    # Alterna o quadro de caminhada a cada passo dado.
+    lw t3, 0(t2)
+    xori t3, t3, 1
+    sw t3, 0(t2)
     j inimigo_calcula
 olho_move:
     li t0, OLHO_INTERVALO
@@ -290,8 +273,8 @@ atualiza_fim:
     addi sp, sp, 16
     ret
 
-# Impede o ogro de entrar nos quatro pocos de lava da fase 2 (nivel 1).
-# a0=x candidato, a1=y candidato; devolve a0=1 quando a posicao e segura.
+# Impede o ogro de entrar nos quatro pocos de lava da fase 2 (nível 1).
+# a0=x candidato, a1=y candidato; devolve a0=1 quando a posição e segura.
 ogro_pode_andar:
     la t0, nivel_atual
     lw t0, 0(t0)
@@ -340,6 +323,8 @@ ogro_pos_bloqueada:
     ret
 
 ogro_checa_lava:
+    addi sp, sp, -4
+    sw ra, 0(sp)
     la t0, nivel_atual
     lw t0, 0(t0)
     li t2, 1
@@ -385,6 +370,8 @@ lava_mata:
     mv a0, s1
     jal mata_inimigo
 ogro_lava_fim:
+    lw ra, 0(sp)
+    addi sp, sp, 4
     ret
 
 draw_inimigos:
@@ -405,7 +392,8 @@ draw_inimigos_loop:
     beq t0, t1, draw_olho
     la a0, vilao
     addi a0, a0, 8
-    lw t0, 12(s1)
+    la t0, ogro_anim_frame
+    lw t0, 0(t0)
     li t1, 1024
     mul t0, t0, t1
     add a0, a0, t0
@@ -426,7 +414,7 @@ draw_inimigos_fim:
     addi sp, sp, 12
     ret
 
-# a0=pixels (32x32), a1=x, a2=y
+# A0=pixels (32x32), a1=x, a2=y
 draw_sprite32:
     la t0, base_frame_A
     lw t0, 0(t0)
@@ -458,7 +446,7 @@ draw32_prox_linha:
 draw32_fim:
     ret
 
-# a0=registro do inimigo. Conta a morte e toca o audio correspondente.
+# a0 aponta para o registro do inimigo. A rotina contabiliza a morte e toca o áudio adequado.
 mata_inimigo:
     addi sp, sp, -8
     sw ra, 4(sp)
@@ -468,7 +456,7 @@ mata_inimigo:
     sw zero, 8(s1)
     li t1, TIPO_OLHO
     beq t0, t1, mata_olho
-    jal tocar_som_goblin_morre
+    jal tocar_som_ogro_morre
     j mata_conta
 mata_olho:
     jal tocar_som_olho_morre

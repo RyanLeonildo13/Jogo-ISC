@@ -1,14 +1,14 @@
-#########################################################################
-# Rotina de tratamento de excecao e interrupcao		v2.4		#
-# Lembre-se: Os ecalls originais do Rars possuem precedencia sobre	#
-# 	     estes definidos aqui					#
-# Os ecalls 1XX usam o BitMap Display e Keyboard Display MMIO Tools	#
-# Usar o RARS16_Custom1	(misa)						#
-# Marcus Vinicius Lamar							#
-# 2024/1								#
-#########################################################################
+# -----------------------------------------------------------------------------
+# Rotina de tratamento de exceções e interrupções		v2.4
+# Observação: os ecalls originais do RARS têm precedência sobre
+# estes definidos aqui
+# Os ecalls 1XX usam o BitMap Display e Keyboard Display MMIO Tools
+# Usar o RARS16_Custom1	(misa)
+# Marcus Vinicius Lamar
+# 2024/1
+# -----------------------------------------------------------------------------
 
-# incluir o MACROSv24.s no in�cio do seu programa!!!!
+# Incluir o MACROSv24.s no início do seu programa!!!!
 
 .data
 .align 2
@@ -41,19 +41,19 @@ LabelTabChar:
 	0x10101010, 0x00101010, 0x04080830, 0x00300808, 0x92600000, 0x0000000C, 0x243C1818, 0xA55A7E3C, 
 	0x99FF5A81, 0x99663CFF, 0x10280000, 0x00000028, 0x10081020, 0x00081020
 
-# scancode -> ascii
+# Scancode -> ascii
 LabelScanCode:
-#  	0     1     2     3     4     5     6     7     8     9     A     B     C     D     E     F
-.byte 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, # 00 a 0F
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x71, 0x31, 0x00, 0x00, 0x00, 0x7a, 0x73, 0x61, 0x77, 0x32, 0x00, # 10 a 1F 
-	0x00, 0x63, 0x78, 0x64, 0x65, 0x34, 0x33, 0x00, 0x00, 0x20, 0x76, 0x66, 0x74, 0x72, 0x35, 0x00, # 20 a 2F   29 espaco => 20
-	0x00, 0x6e, 0x62, 0x68, 0x67, 0x79, 0x36, 0x00, 0x00, 0x00, 0x6d, 0x6a, 0x75, 0x37, 0x38, 0x00, # 30 a 3F 
-	0x00, 0x2c, 0x6b, 0x69, 0x6f, 0x30, 0x39, 0x00, 0x00, 0x2e, 0x2f, 0x6c, 0x3b, 0x70, 0x2d, 0x00, # 40 a 4F 
-	0x00, 0x00, 0x27, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x5b, 0x00, 0x5d, 0x00, 0x00, # 50 a 5F   5A Enter => 0A (= ao Rars)
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x31, 0x00, 0x34, 0x37, 0x00, 0x00, 0x00, # 60 a 6F   66 Backspace => 08
-	0x30, 0x2e, 0x32, 0x35, 0x36, 0x38, 0x00, 0x00,	0x00, 0x2b, 0x33, 0x2d, 0x2a, 0x39, 0x00, 0x00, # 70 a 7F 
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00						   		# 80 a 85
-# scancode -> ascii (com shift)
+# 0     1     2     3     4     5     6     7     8     9     A     B     C     D     E     F
+.byte 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    # 00 a 0F.
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x71, 0x31, 0x00, 0x00, 0x00, 0x7a, 0x73, 0x61, 0x77, 0x32, 0x00,    # 10 a 1F.
+	0x00, 0x63, 0x78, 0x64, 0x65, 0x34, 0x33, 0x00, 0x00, 0x20, 0x76, 0x66, 0x74, 0x72, 0x35, 0x00,    # 20 a 2F; o código 29 representa espaço (0x20).
+	0x00, 0x6e, 0x62, 0x68, 0x67, 0x79, 0x36, 0x00, 0x00, 0x00, 0x6d, 0x6a, 0x75, 0x37, 0x38, 0x00,    # 30 a 3F.
+	0x00, 0x2c, 0x6b, 0x69, 0x6f, 0x30, 0x39, 0x00, 0x00, 0x2e, 0x2f, 0x6c, 0x3b, 0x70, 0x2d, 0x00,    # 40 a 4F.
+	0x00, 0x00, 0x27, 0x00, 0x00, 0x3d, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x5b, 0x00, 0x5d, 0x00, 0x00,    # 50 a 5F   5A Enter => 0A (= ao Rars)
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x31, 0x00, 0x34, 0x37, 0x00, 0x00, 0x00,    # 60 a 6F   66 Backspace => 08.
+	0x30, 0x2e, 0x32, 0x35, 0x36, 0x38, 0x00, 0x00,	0x00, 0x2b, 0x33, 0x2d, 0x2a, 0x39, 0x00, 0x00,    # 70 a 7F.
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00    # 80 a 85.
+# Scancode -> ascii (com shift)
 LabelScanCodeShift:
 .byte   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x51, 0x21, 0x00, 0x00, 0x00, 0x5a, 0x53, 0x41, 0x57, 0x40, 0x00, 
@@ -67,11 +67,11 @@ LabelScanCodeShift:
 
 .align 2
 
-#buffer do ReadString, ReadFloat, SDread, etc. 512 caracteres/bytes
+# Buffer do ReadString, ReadFloat, SDread, etc. 512 caracteres/bytes
 TempBuffer:
 .space 512
 
-# tabela de conversao hexa para ascii
+# Tabela de conversao hexa para ascii
 TabelaHexASCII:		.string "0123456789ABCDEF  "
 NumDesnormP:		.string "+desnorm"
 NumDesnormN:		.string "-desnorm"
@@ -80,7 +80,7 @@ NumInfP:		.string "+Infinity"
 NumInfN:		.string "-Infinity"
 NumNaN:			.string "NaN"
 
-# tabela de causa de exce��es 
+# Tabela de causa de exceções
 Cause0: 		.string "Error: 0 Instruction address misaligned "
 Cause1: 		.string "Error: 1 Instruction access fault "
 Cause2: 		.string "Error: 2 Ilegal Instruction "
@@ -95,41 +95,41 @@ PC:     		.string "PC: "
 Addrs:  		.string "Addrs: "
 Instr:  		.string "Instr: "
 
-############################################################################################################
-### Obs.: a forma 'LABEL: instrucao' embora fique feio facilita o debug no Rars, por favor nao reformatar!!!
-############################################################################################################
+# -----------------------------------------------------------------------------
+# Obs.: a forma 'LABEL: instrução' embora fique feio facilita o debug no Rars, por favor não reformatar!!!
+# -----------------------------------------------------------------------------
 .text
 
 
-###### Devem ser colocadas aqui as identifica��es das interrup��es e exce��es #######
+# --- Devem ser colocadas aqui as identificações das interrupções e exceções ---
 
-	csrwi ucause,1		# caso ocorra dropdown vai gerar exce��o de instru��o inv�lida
+	csrwi ucause,1    # Caso ocorra dropdown vai gerar exceção de instrução inválida.
 
-ExceptionHandling:	addi 	sp, sp, -8 	# salva 2 registradores utilizados para comparar ucause
+ExceptionHandling:	addi 	sp, sp, -8    # Preserva 2 registradores utilizados para comparar ucause.
 	sw 	t0, 0(sp)
 	sw 	s10, 4(sp)
 
-	csrr	s10,ucause     # le o ucause e salva em s10
+	csrr	s10,ucause    # Lê o ucause e salva em s10.
 	
 	li 	t0, 8
-	bne 	t0, s10, errorExceptions  	# N�o � ecall - nem precisa arrumar a pilha!
+	bne 	t0, s10, errorExceptions    # Não é ecall - nem precisa arrumar a pilha!
 
-	lw 	t0, 0(sp)			# � ecall
-    	lw 	s10, 4(sp)  			# recupera registradores usados
+	lw 	t0, 0(sp)    # É ecall.
+    	lw 	s10, 4(sp)    # Recupera registradores usados.
     	addi 	sp, sp, 8			
 	j 	ecallException
 	
-######################################################
-###############   Exce��es de Erros   ################
-######################################################
+# -----------------------------------------------------------------------------
+# --- Exceções de Erros ---
+# -----------------------------------------------------------------------------
 
-errorExceptions: csrr 	s11, utval      # le o utval da exce��o e salva em s11	
-	addi 	a0, zero, 0xc0 		## printa tela de azul
+errorExceptions: csrr 	s11, utval    # Lê o utval da exceção e salva em s11.
+	addi 	a0, zero, 0xc0    # Printa tela de azul.
 	addi 	a1, zero, 0
 	addi 	a7, zero, 148
 	jal 	clsCLS
 	
-#  Instruction address misaligned 	
+# Instruction address misaligned
 End_Cause0:	li 	t0, 0
 		bne 	t0, s10, End_Cause1
 		la 	a0, Cause0
@@ -139,7 +139,7 @@ End_Cause0:	li 	t0, 0
 		jal	printString
 		j	End_uepc
 	
-# Instruction access fault 
+# Instruction access fault
 End_Cause1:	li 	t0, 1
 		bne 	t0, s10, End_Cause2
 		la 	a0, Cause1
@@ -149,7 +149,7 @@ End_Cause1:	li 	t0, 1
 		jal 	printString	
 		j	End_uepc
 			
-# Ilegal Instruction 
+# Ilegal Instruction
 End_Cause2:	li 	t0, 2
 		bne 	t0, s10, End_Cause4
 		la 	a0, Cause2
@@ -161,7 +161,7 @@ End_Cause2:	li 	t0, 2
 		la 	a0, Instr
 		j	End_utval
 	
-# Load address misaligned 
+# Load address misaligned
 End_Cause4:	addi 	t0, zero, 4
 		bne	t0, s10, End_Cause5
 		la 	a0, Cause4
@@ -173,7 +173,7 @@ End_Cause4:	addi 	t0, zero, 4
 		la 	a0, Addrs
 		j	End_utval
 		
-# Load access fault 
+# Load access fault
 End_Cause5:	li 	t0, 5
 		bne 	t0, s10, End_Cause6
 		la 	a0, Cause5
@@ -185,7 +185,7 @@ End_Cause5:	li 	t0, 5
 		la 	a0, Addrs
 		j	End_utval
 		
-#Store address misaligned 
+# Store address misaligned
 End_Cause6:	li 	t0, 6
 		bne 	t0, s10, End_Cause7
 		la 	a0, Cause6
@@ -197,7 +197,7 @@ End_Cause6:	li 	t0, 6
 		la 	a0, Addrs
 		j	End_utval
 	
-# Store access fault 
+# Store access fault
 End_Cause7:	li 	t0, 7
 		bne 	t0, s10, End_CauseD
 		la 	a0, Cause7
@@ -231,26 +231,26 @@ End_utval:	li 	a1, 0
 		jal 	printHex
 	
 
-End_uepc: 	la 	a0, PC 		# Imprime o pc em que a exce��o ocorreu
+End_uepc: 	la 	a0, PC    # Imprime o pc em que a exceção ocorreu.
 		li 	a1, 0
 		li 	a2, 12
 		li 	a3, 0x000c0ff
 		jal 	printString
 		
-		csrr 	a0, uepc	# Le uepc	
+		csrr 	a0, uepc    # Lê uepc.
 		li	a1, 28
 		li 	a2, 12
 		li 	a3, 0x0000c0ff
 		jal 	printHex	
 		
-		j goToExit 		# encerra execu��o
+		j goToExit    # Encerra execução.
 
 
 
-######################################################
-#############   exce��o de ECALL   ###################
-######################################################
-ecallException:   addi    sp, sp, -264              # Salva todos os registradores na pilha
+# -----------------------------------------------------------------------------
+# --- exceção de ECALL ---
+# -----------------------------------------------------------------------------
+ecallException:   addi    sp, sp, -264    # Preserva todos os registradores na pilha.
     sw     x1,    0(sp)
     sw     x2,    4(sp)
     sw     x3,    8(sp)
@@ -316,7 +316,7 @@ ecallException:   addi    sp, sp, -264              # Salva todos os registrador
     fsw    f30, 244(sp)
     fsw    f31, 248(sp)
  ecallException.pula:   
-    # Zera os valores dos registradores temporarios
+    # Zera os valores dos registradores temporários
     add     t0, zero, zero
     add     t1, zero, zero
     add     t2, zero, zero
@@ -327,201 +327,201 @@ ecallException:   addi    sp, sp, -264              # Salva todos os registrador
 
 
 
-    # Verifica o numero da chamada do sistema
+    # Verifica o número da chamada do sistema
     addi    t0, zero, 10
-    beq     t0, a7, goToExit          # ecall exit
+    beq     t0, a7, goToExit    # Ecall exit.
     addi    t0, zero, 110
-    beq     t0, a7, goToExit          # ecall exit
+    beq     t0, a7, goToExit    # Ecall exit.
     
-    addi    t0, zero, 1               # ecall 1 = print int
+    addi    t0, zero, 1    # Ecall 1 = print int.
     beq     t0, a7, goToPrintInt
-    addi    t0, zero, 101             # ecall 1 = print int
+    addi    t0, zero, 101    # Ecall 1 = print int.
     beq     t0, a7, goToPrintInt
 
-    addi    t0, zero, 2               # ecall 2 = print float
+    addi    t0, zero, 2    # Ecall 2 = print float.
     beq     t0, a7, goToPrintFloat
-    addi    t0, zero, 102             # ecall 2 = print float
+    addi    t0, zero, 102    # Ecall 2 = print float.
     beq     t0, a7, goToPrintFloat
 
-    addi    t0, zero, 3               # ecall 3 = print double
+    addi    t0, zero, 3    # Ecall 3 = print double.
     beq     t0, a7, goToPrintDouble
-    addi    t0, zero, 103             # ecall 2 = print double
+    addi    t0, zero, 103    # Ecall 2 = print double.
     beq     t0, a7, goToPrintDouble
 
-    addi    t0, zero, 4               # ecall 4 = print string
+    addi    t0, zero, 4    # Ecall 4 = print string.
     beq     t0, a7, goToPrintString
-    addi    t0, zero, 104             # ecall 4 = print string
+    addi    t0, zero, 104    # Ecall 4 = print string.
     beq     t0, a7, goToPrintString
 
-    addi    t0, zero, 5               # ecall 5 = read int
+    addi    t0, zero, 5    # Ecall 5 = read int.
     beq     t0, a7, goToReadInt
-    addi    t0, zero, 105             # ecall 5 = read int
+    addi    t0, zero, 105    # Ecall 5 = read int.
     beq     t0, a7, goToReadInt
 
-    addi    t0, zero, 6               # ecall 6 = read float
+    addi    t0, zero, 6    # Ecall 6 = read float.
     beq     t0, a7, goToReadFloat
-    addi    t0, zero, 106             # ecall 6 = read float
+    addi    t0, zero, 106    # Ecall 6 = read float.
     beq     t0, a7, goToReadFloat
 
-    addi    t0, zero, 7               # ecall 7 = read Double
+    addi    t0, zero, 7    # Ecall 7 = read Double.
     beq     t0, a7, goToReadDouble
-    addi    t0, zero, 107             # ecall 7 = read Double
+    addi    t0, zero, 107    # Ecall 7 = read Double.
     beq     t0, a7, goToReadDouble
 
-    addi    t0, zero, 8               # ecall 8 = read string
+    addi    t0, zero, 8    # Ecall 8 = read string.
     beq     t0, a7, goToReadString
-    addi    t0, zero, 108             # ecall 8 = read string
+    addi    t0, zero, 108    # Ecall 8 = read string.
     beq     t0, a7, goToReadString
 
-    addi    t0, zero, 11              # ecall 11 = print char
+    addi    t0, zero, 11    # Ecall 11 = print char.
     beq     t0, a7, goToPrintChar
-    addi    t0, zero, 111             # ecall 11 = print char
+    addi    t0, zero, 111    # Ecall 11 = print char.
     beq     t0, a7, goToPrintChar
 
-    addi    t0, zero, 12              # ecall 12 = read char
+    addi    t0, zero, 12    # Ecall 12 = read char.
     beq     t0, a7, goToReadChar
-    addi    t0, zero, 112             # ecall 12 = read char
+    addi    t0, zero, 112    # Ecall 12 = read char.
     beq     t0, a7, goToReadChar
 
 
-    addi    t0, zero, 30              # ecall 30 = time
+    addi    t0, zero, 30    # Ecall 30 = time.
     beq     t0, a7, goToTime
-    addi    t0, zero, 130             # ecall 30 = time
+    addi    t0, zero, 130    # Ecall 30 = time.
     beq     t0, a7, goToTime
     
-    addi    t0, zero, 31              # ecall 31 = MIDI out
-    beq     t0, a7, goToMidiOut       # Generate tone and return immediately
-    addi    t0, zero, 131             # ecall 31 = MIDI out
+    addi    t0, zero, 31    # Ecall 31 = MIDI out.
+    beq     t0, a7, goToMidiOut    # Generate tone and return immediately.
+    addi    t0, zero, 131    # Ecall 31 = MIDI out.
     beq     t0, a7, goToMidiOut
     
-    addi    t0, zero, 32              # ecall 32 = sleep
+    addi    t0, zero, 32    # Ecall 32 = sleep.
     beq     t0, a7, goToSleep
-    addi    t0, zero, 132             # ecall 32 = sleep
+    addi    t0, zero, 132    # Ecall 32 = sleep.
     beq     t0, a7, goToSleep
     
-    addi    t0, zero, 33              # ecall 33 = MIDI out synchronous
-    beq     t0, a7, goToMidiOutSync   # Generate tone and return upon tone completion
-    addi    t0, zero, 133             # ecall 33 = MIDI out synchronous
+    addi    t0, zero, 33    # Ecall 33 = MIDI out synchronous.
+    beq     t0, a7, goToMidiOutSync    # Generate tone and return upon tone completion.
+    addi    t0, zero, 133    # Ecall 33 = MIDI out synchronous.
     beq     t0, a7, goToMidiOutSync
    
-    addi    t0, zero, 34       		# ecall 34 = print hex
+    addi    t0, zero, 34    # Ecall 34 = print hex.
     beq     t0, a7, goToPrintHex
-    addi    t0, zero, 134		# ecall 34 = print hex
+    addi    t0, zero, 134    # Ecall 34 = print hex.
     beq     t0, a7, goToPrintHex
    
-#    Print Bin n�o implementado ainda
-#    addi    t0, zero, 35       	# ecall 35 = print bin
-#    beq     t0, a7, goToPrintBin
-#    addi    t0, zero, 134		# ecall 35 = print bin
-#    beq     t0, a7, goToPrintBin
+# Print Bin não implementado ainda
+# Trecho desativado, mantido para consulta: addi    t0, zero, 35       	# ecall 35 = print bin
+# Trecho desativado, mantido para consulta: beq     t0, a7, goToPrintBin
+# Trecho desativado, mantido para consulta: addi    t0, zero, 134		# ecall 35 = print bin
+# Trecho desativado, mantido para consulta: beq     t0, a7, goToPrintBin
    
-    addi    t0, zero, 36              # ecall 36 = PrintIntUnsigned
+    addi    t0, zero, 36    # Ecall 36 = PrintIntUnsigned.
     beq     t0, a7, goToPrintIntUnsigned
-    addi    t0, zero, 136             # ecall 36 = PrintIntUnsigned
+    addi    t0, zero, 136    # Ecall 36 = PrintIntUnsigned.
     beq     t0, a7, goToPrintIntUnsigned
     
 
-    addi    t0, zero, 41              # ecall 41 = random
+    addi    t0, zero, 41    # Ecall 41 = random.
     beq     t0, a7, goToRandom
-    addi    t0, zero, 141             # ecall 41 = random
+    addi    t0, zero, 141    # Ecall 41 = random.
     beq     t0, a7, goToRandom
 
-    addi    t0, zero, 42              # ecall 41 = random
+    addi    t0, zero, 42    # Ecall 41 = random.
     beq     t0, a7, goToRandom2
-    addi    t0, zero, 142             # ecall 41 = random
+    addi    t0, zero, 142    # Ecall 41 = random.
     beq     t0, a7, goToRandom2
 
 
-    addi    t0, zero, 47              # ecall 47 = DrawLine
+    addi    t0, zero, 47    # Ecall 47 = DrawLine.
     beq     t0, a7, goToBRES
-    addi    t0, zero, 147              # ecall 47 = DrawLine
+    addi    t0, zero, 147    # Ecall 47 = DrawLine.
     beq     t0, a7, goToBRES    
 
-    addi    t0, zero, 48              # ecall 48 = CLS
+    addi    t0, zero, 48    # Ecall 48 = CLS.
     beq     t0, a7, goToCLS
-    addi    t0, zero, 148              # ecall 48 = CLS
+    addi    t0, zero, 148    # Ecall 48 = CLS.
     beq     t0, a7, goToCLS
 
 
 
 
-    jal NaoExisteEcall  # ecall inexistente
+    jal NaoExisteEcall    # Ecall inexistente.
 
-	## end execution ##
-	goToExit:   	DE1(s8,goToExitDE2)		# se for a DE1 pula
-			li 	a7, 10			# chama o ecall normal do Rars
-			ecall				# exit ecall	
-	goToExitDE2:	j 	goToExitDE2		# trava o processador : N�o tem sistema operacional!
+	# End execution
+	goToExit:   	DE1(s8,goToExitDE2)    # Se for a DE1 pula.
+			li 	a7, 10    # Chama o ecall normal do Rars.
+			ecall    # Exit ecall.
+	goToExitDE2:	j 	goToExitDE2    # Trava o processador : Não tem sistema operacional!
 
-	goToPrintInt:	jal     printInt               	# chama printInt
+	goToPrintInt:	jal     printInt    # Chama printInt.
 			j       endEcall
 
-	goToPrintString: jal     printString           	# chama printString
+	goToPrintString: jal     printString    # Chama printString.
 			 j       endEcall
 
-	goToPrintChar:	jal     printChar		# chama printChar
+	goToPrintChar:	jal     printChar    # Chama printChar.
 			j       endEcall
 
 	goToPrintFloat: NAOTEM_F(s8,NaoExisteEcall)
-			jal     printFloat		# chama printFloat
+			jal     printFloat    # Chama printFloat.
 			j       endEcall
 
 	goToPrintDouble: NAOTEM_F(s8,NaoExisteEcall)
-			jal     printDouble		# chama printDuble
+			jal     printDouble    # Chama printDuble.
 			j       endEcall
 
 
-	goToReadChar:	jal     readChar              	# chama readChar
+	goToReadChar:	jal     readChar    # Chama readChar.
 			j       endEcall
 
-	goToReadInt:   	jal     readInt                 # chama readInt
+	goToReadInt:   	jal     readInt    # Chama readInt.
 			j       endEcall
 
-	goToReadString:	jal     readString              # chama readString
+	goToReadString:	jal     readString    # Chama readString.
 			j       endEcall
 
 	goToReadFloat:	NAOTEM_F(s8,NaoExisteEcall)
-			jal     readFloat               # chama readFloat
+			jal     readFloat    # Chama readFloat.
 			j       endEcall
 
 	goToReadDouble:	NAOTEM_F(s8,NaoExisteEcall)
-			jal     readDouble               # chama readDouble
+			jal     readDouble    # Chama readDouble.
 			j       endEcall
 
 
-	goToPrintHex:	jal     printHex                # chama printHex
+	goToPrintHex:	jal     printHex    # Chama printHex.
 			j       endEcall
 
-	goToPrintIntUnsigned: 	jal	printIntUnsigned	# chama Print Unsigned Int
+	goToPrintIntUnsigned: 	jal	printIntUnsigned    # Chama Print Unsigned Int.
 				j	endEcall  
 					
-	goToMidiOut:	jal     midiOut                 # chama MIDIout
+	goToMidiOut:	jal     midiOut    # Chama MIDIout.
 			j       endEcall
 
-	goToMidiOutSync: jal     midiOutSync   		# chama MIDIoutSync
+	goToMidiOutSync: jal     midiOutSync    # Chama MIDIoutSync.
 			 j       endEcall
 
-	goToTime:	jal     Time                    # chama time
+	goToTime:	jal     Time    # Chama time.
 			j       endEcall
 
-	goToSleep:	jal     Sleep                  	# chama sleep
+	goToSleep:	jal     Sleep    # Chama sleep.
 			j       endEcall
 
-	goToRandom:	jal     Random                 	# chama random
+	goToRandom:	jal     Random    # Chama random.
 			j       endEcall
 
-	goToRandom2:	jal     Random2                 # chama random2
+	goToRandom2:	jal     Random2    # Chama random2.
 			j       endEcall
 
-	goToCLS:	jal     clsCLS                 	# chama CLS
+	goToCLS:	jal     clsCLS    # Chama CLS.
 			j       endEcall
 
-	goToBRES:	jal     BRESENHAM               # chama BRESENHAM
+	goToBRES:	jal     BRESENHAM    # Chama BRESENHAM.
 			j       endEcall    	
   		    				    		    				    		    		
 		
 
-endEcall:  	lw	x1,   0(sp)  # recupera QUASE todos os registradores na pilha
+endEcall:  	lw	x1,   0(sp)    # Recupera QUASE todos os registradores na pilha.
 		lw	x2,   4(sp)	
 		lw	x3,   8(sp)	
 		lw	x4,  12(sp)      	
@@ -530,8 +530,8 @@ endEcall:  	lw	x1,   0(sp)  # recupera QUASE todos os registradores na pilha
 		lw	x7,  24(sp)
 		lw	x8,  28(sp)
 		lw	x9,  32(sp)
-	#	lw      x10, 36(sp)	# a0 retorno de valor
-	#	lw     x11, 40(sp)	# a1 retorno de valor
+	# Trecho desativado, mantido para consulta: lw      x10, 36(sp)	# a0 retorno de valor
+	# Trecho desativado, mantido para consulta: lw     x11, 40(sp)	# a1 retorno de valor
 		lw     x12, 44(sp)
 		lw     x13, 48(sp)
 		lw     x14, 52(sp)
@@ -563,8 +563,8 @@ endEcall:  	lw	x1,   0(sp)  # recupera QUASE todos os registradores na pilha
 		flw    f7,  152(sp)
 		flw    f8,  156(sp)
 		flw    f9,  160(sp)
-	#   	flw    f10, 164(sp)		# fa0 retorno de valor
-	#	flw    f11, 168(sp)		# fa1 retorno de valor
+	# Trecho desativado, mantido para consulta: flw    f10, 164(sp)		# fa0 retorno de valor
+	# Trecho desativado, mantido para consulta: flw    f11, 168(sp)		# fa1 retorno de valor
 		flw    f12, 172(sp)
 		flw    f13, 176(sp)
 		flw    f14, 180(sp)
@@ -588,18 +588,18 @@ endEcall:  	lw	x1,   0(sp)  # recupera QUASE todos os registradores na pilha
 
 endEcall.pula:	addi    sp, sp, 264
 
-		csrr 	tp, uepc 	# le o valor de EPC salvo no registrador uepc (reg 65)
-		addi 	tp, tp, 4	# soma 4 para obter a instrucao seguinte ao ecall
-		csrw 	tp, uepc	# coloca no registrador uepc
-		uret			# retorna PC=uepc
+		csrr 	tp, uepc    # Lê o valor de EPC salvo no registrador uepc (reg 65)
+		addi 	tp, tp, 4    # Soma 4 para obter a instrução seguinte ao ecall.
+		csrw 	tp, uepc    # Coloca no registrador uepc.
+		uret    # Retorna PC=uepc.
 
 
-#########################################################
-#  Nao Existe Ecall                         		#
-#  Para o caso de ecalls de fp mas ISA RV32I e RV32IM   #
-#########################################################
+# -----------------------------------------------------------------------------
+# não Existe Ecall
+# Para o caso de ecalls de fp mas ISA RV32I e RV32IM
+# -----------------------------------------------------------------------------
 
-NaoExisteEcall: addi 	a0, zero, 0xc0 		## printa tela de azul
+NaoExisteEcall: addi 	a0, zero, 0xc0    # Printa tela de azul.
 		addi 	a1, zero, 0
 		mv 	a6, a7
 		addi 	a7, zero, 148
@@ -621,408 +621,408 @@ NaoExisteEcall: addi 	a0, zero, 0xc0 		## printa tela de azul
 		jal 	printHex		
 		j 	goToExit
 
-####################################################################################################
+# -----------------------------------------------------------------------------
 
-#############################################
-#  PrintInt                                 #
-#  a0    =    valor inteiro                 #
-#  a1    =    x                             #
-#  a2    =    y  			    #
-#  a3    =    cor                           #
-#############################################
+# -----------------------------------------------------------------------------
+# PrintInt
+# a0    =    valor inteiro
+# a1    =    x
+# a2    =    y
+# a3    =    cor
+# -----------------------------------------------------------------------------
 
-printInt:	addi 	sp, sp, -4			# Aloca espaco
-		sw 	ra, 0(sp)			# salva ra
-		la 	t0, TempBuffer			# carrega o Endereco do Buffer da String
+printInt:	addi 	sp, sp, -4    # Reserva espaço na pilha.
+		sw 	ra, 0(sp)    # Preserva ra, que contém o endereço de retorno.
+		la 	t0, TempBuffer    # Carrega o endereço do Buffer da String.
 		
-		bge 	a0, zero, ehposprintInt		# Se eh positvo
-		li 	t1, '-'				# carrega o sinal -
-		sb 	t1, 0(t0)			# coloca no buffer
-		addi 	t0, t0, 1			# incrementa endereco do buffer
-		sub 	a0, zero, a0			# torna o numero positivo
+		bge 	a0, zero, ehposprintInt    # Se é positvo.
+		li 	t1, '-'    # Carrega o sinal -.
+		sb 	t1, 0(t0)    # Coloca no buffer.
+		addi 	t0, t0, 1    # Incrementa endereço do buffer.
+		sub 	a0, zero, a0    # Torna o número positivo.
 		
-ehposprintInt:  li 	t2, 10				# carrega numero 10
-		li 	t1, 0				# carrega numero de digitos com 0
+ehposprintInt:  li 	t2, 10    # Carrega número 10.
+		li 	t1, 0    # Carrega número de digitos com 0.
 		
 loop1printInt:	TEM_M(s8,printInt.pula1)
 		DIV10(t4,a0)
 		REM10(t3,a0)
 		j 	printInt.pula1d
-printInt.pula1:	div 	t4, a0, t2			# divide por 10 (quociente)
-		rem 	t3, a0, t2			# resto
-printInt.pula1d:addi 	sp, sp, -4			# aloca espaco na pilha
-		sw 	t3, 0(sp)			# coloca resto na pilha
-		mv 	a0, t4				# atualiza o numero com o quociente
-		addi 	t1, t1, 1			# incrementa o contador de digitos
-		bne 	a0, zero, loop1printInt		# verifica se o numero eh zero
+printInt.pula1:	div 	t4, a0, t2    # Divide por 10 (quociente)
+		rem 	t3, a0, t2    # Resto.
+printInt.pula1d:addi 	sp, sp, -4    # Reserva espaço na pilha na pilha.
+		sw 	t3, 0(sp)    # Coloca resto na pilha.
+		mv 	a0, t4    # Atualiza o número com o quociente.
+		addi 	t1, t1, 1    # Incrementa o contador de digitos.
+		bne 	a0, zero, loop1printInt    # Verifica se o número é zero.
 				
-loop2printInt:	lw 	t2, 0(sp)			# le digito da pilha
-		addi 	sp, sp, 4			# libera espaco
-		addi 	t2, t2, 48			# converte o digito para ascii
-		sb 	t2, 0(t0)			# coloca caractere no buffer
-		addi 	t0, t0, 1			# incrementa endereco do buffer
-		addi 	t1, t1, -1			# decrementa contador de digitos
-		bne 	t1, zero, loop2printInt		# eh o ultimo?
-		sb 	zero, 0(t0)			# insere \NULL na string
+loop2printInt:	lw 	t2, 0(sp)    # Lê digito da pilha.
+		addi 	sp, sp, 4    # Libera o espaço reservado na pilha.
+		addi 	t2, t2, 48    # Converte o digito para ascii.
+		sb 	t2, 0(t0)    # Coloca caractere no buffer.
+		addi 	t0, t0, 1    # Incrementa endereço do buffer.
+		addi 	t1, t1, -1    # Decrementa contador de digitos.
+		bne 	t1, zero, loop2printInt    # É o último?
+		sb 	zero, 0(t0)    # Insere \NULL na string.
 		
-		la 	a0, TempBuffer			# Endereco do buffer da srting
-		jal 	printString			# chama o print string
+		la 	a0, TempBuffer    # Endereço do buffer da srting.
+		jal 	printString    # Chama o print string.
 				
-		lw 	ra, 0(sp)			# recupera a
-		addi 	sp, sp, 4			# libera espaco
-fimprintInt:	ret					# retorna
+		lw 	ra, 0(sp)    # Recupera a.
+		addi 	sp, sp, 4    # Libera o espaço reservado na pilha.
+fimprintInt:	ret    # Retorna.
 		
 
 
-#############################################
-#  PrintHex                                 #
-#  a0    =    valor inteiro                 #
-#  a1    =    x                             #
-#  a2    =    y                             #
-#  a3    =    cor			    #
-#############################################
+# -----------------------------------------------------------------------------
+# PrintHex
+# a0    =    valor inteiro
+# a1    =    x
+# a2    =    y
+# a3    =    cor
+# -----------------------------------------------------------------------------
 
-printHex:	addi    sp, sp, -4    		# aloca espaco
-    		sw      ra, 0(sp)		# salva ra
-		mv 	t0, a0			# Inteiro de 32 bits a ser impresso em Hexa
-		la 	t1, TabelaHexASCII	# endereco da tabela HEX->ASCII
-		la 	t2, TempBuffer		# onde a string sera montada
+printHex:	addi    sp, sp, -4    # Reserva espaço na pilha.
+    		sw      ra, 0(sp)    # Preserva ra, que contém o endereço de retorno.
+		mv 	t0, a0    # Inteiro de 32 bits a ser impresso em Hexa.
+		la 	t1, TabelaHexASCII    # Endereço da tabela HEX->ASCII.
+		la 	t2, TempBuffer    # Onde a string será montada.
 
-		li 	t3,'0'			# Caractere '0'
-		sb 	t3,0(t2)		# Escreve '0' no Buffer da String
-		li 	t3,'x'			# Caractere 'x'
-		sb 	t3,1(t2)		# Escreve 'x' no Buffer da String
-		addi 	t2,t2,2			# novo endereco inicial da string
+		li 	t3,'0'    # Caractere '0'.
+		sb 	t3,0(t2)    # Escreve '0' no Buffer da String.
+		li 	t3,'x'    # Caractere 'x'.
+		sb 	t3,1(t2)    # Escreve 'x' no Buffer da String.
+		addi 	t2,t2,2    # Novo endereço inicial da string.
 
-		li 	t3, 28			# contador de nibble   inicio = 28
-loopprintHex:	blt 	t3, zero, fimloopprintHex	# terminou? t3<0?
-		srl 	t4, t0, t3		# desloca o nibble para direita
-		andi 	t4, t4, 0x000F		# mascara o nibble	
-		add 	t4, t1, t4		# endereco do ascii do nibble
-		lb 	t4, 0(t4)		# le ascii do nibble
-		sb 	t4, 0(t2)		# armazena o ascii do nibble no buffer da string
-		addi 	t2, t2, 1		# incrementa o endereco do buffer
-		addi 	t3, t3, -4		# decrementa o numero do nibble
+		li 	t3, 28    # Contador de nibble   início = 28.
+loopprintHex:	blt 	t3, zero, fimloopprintHex    # Terminou? t3<0?
+		srl 	t4, t0, t3    # Desloca o nibble para direita.
+		andi 	t4, t4, 0x000F    # Mascara o nibble.
+		add 	t4, t1, t4    # Endereço do ascii do nibble.
+		lb 	t4, 0(t4)    # Lê ascii do nibble.
+		sb 	t4, 0(t2)    # Armazena o ascii do nibble no buffer da string.
+		addi 	t2, t2, 1    # Incrementa o endereço do buffer.
+		addi 	t3, t3, -4    # Decrementa o número do nibble.
 		j 	loopprintHex
 		
-fimloopprintHex: sb 	zero,0(t2)		# grava \null na string
-		la 	a0, TempBuffer		# Argumento do print String
-    		jal	printString		# Chama o print string
+fimloopprintHex: sb 	zero,0(t2)    # Grava \null na string.
+		la 	a0, TempBuffer    # Argumento do print String.
+    		jal	printString    # Chama o print string.
     			
-		lw 	ra, 0(sp)		# recupera ra
-		addi 	sp, sp, 4		# libera espaco
-fimprintHex:	ret				# retorna
+		lw 	ra, 0(sp)    # Recupera ra antes de voltar ao chamador.
+		addi 	sp, sp, 4    # Libera o espaço reservado na pilha.
+fimprintHex:	ret    # Retorna.
 
 
-#####################################
-#  PrintSring                       #
-#  a0    =  endereco da string      #
-#  a1    =  x                       #
-#  a2    =  y                       #
-#  a3    =  cor		    	    #
-#####################################
+# -----------------------------------------------------------------------------
+# PrintSring
+# a0    =  endereço da string
+# a1    =  x
+# a2    =  y
+# a3    =  cor
+# -----------------------------------------------------------------------------
 
-printString:	addi	sp, sp, -8			# aloca espaco
-    		sw	ra, 0(sp)			# salva ra
-    		sw	s0, 4(sp)			# salva s0
-    		mv	s0, a0              		# s0 = endereco do caractere na string
+printString:	addi	sp, sp, -8    # Reserva espaço na pilha.
+    		sw	ra, 0(sp)    # Preserva ra, que contém o endereço de retorno.
+    		sw	s0, 4(sp)    # Preserva s0.
+    		mv	s0, a0    # S0 = endereço do caractere na string.
 
-loopprintString:lb	a0, 0(s0)                 	# le em a0 o caracter a ser impresso
+loopprintString:lb	a0, 0(s0)    # Lê em a0 o caracter a ser impresso.
 
-    		beq     a0, zero, fimloopprintString	# string ASCIIZ termina com NULL
+    		beq     a0, zero, fimloopprintString    # String ASCIIZ termina com NULL.
 
-    		jal     printChar       		# imprime char
+    		jal     printChar    # Imprime char.
     		
-		addi    a1, a1, 8                 	# incrementa a coluna
+		addi    a1, a1, 8    # Incrementa a coluna.
 		li 	t6, 313		
-		blt	a1, t6, NaoPulaLinha	    	# se ainda tiver lugar na linha
-    		addi    a2, a2, 8                 	# incrementa a linha
-    		mv    	a1, zero			# volta a coluna zero
+		blt	a1, t6, NaoPulaLinha    # Se ainda tiver lugar na linha.
+    		addi    a2, a2, 8    # Incrementa a linha.
+    		mv    	a1, zero    # Volta a coluna zero.
 
-NaoPulaLinha:	addi    s0, s0, 1			# proximo caractere
-    		j       loopprintString       		# volta ao loop
+NaoPulaLinha:	addi    s0, s0, 1    # Próximo caractere.
+    		j       loopprintString    # Volta ao loop.
 
-fimloopprintString:	lw      ra, 0(sp)    		# recupera ra
-			lw 	s0, 0(sp)		# recupera s0 original
-    			addi    sp, sp, 8		# libera espaco
-fimprintString:	ret      	    			# retorna
-
-
-#########################################################
-#  PrintChar                                            #
-#  a0 = char(ASCII)                                     #
-#  a1 = x                                               #
-#  a2 = y                                               #
-#  a3 = cores (0x0000bbff) 	b = fundo, f = frente	#
-#  a4 = frame (0 ou 1)					#
-#########################################################
-#   t0 = i                                             #
-#   t1 = j                                             #
-#   t2 = endereco do char na memoria                   #
-#   t3 = metade do char (2a e depois 1a)               #
-#   t4 = endereco para impressao                       #
-#   t5 = background color                              #
-#   t6 = foreground color                              #
-#########################################################
-#	t9 foi convertido para s9 pois nao ha registradores temporarios sobrando dentro desta funcao
+fimloopprintString:	lw      ra, 0(sp)    # Recupera ra antes de voltar ao chamador.
+			lw 	s0, 0(sp)    # Recupera s0 original.
+    			addi    sp, sp, 8    # Libera o espaço reservado na pilha.
+fimprintString:	ret    # Retorna.
 
 
-printChar:	li 	t4, 0xFF	# t4 temporario
-		slli 	t4, t4, 8	# t4 = 0x0000FF00 (no RARS, nao podemos fazer diretamente "andi rd, rs1, 0xFF00")
-		and    	t5, a3, t4   	# t5 obtem cor de fundo
-    		srli	t5, t5, 8	# numero da cor de fundo
-		andi   	t6, a3, 0xFF    # t6 obtem cor de frente
+# -----------------------------------------------------------------------------
+# PrintChar
+# a0 = char(ASCII)
+# a1 = x
+# a2 = y
+# a3 = cores (0x0000bbff) 	b = fundo, f = frente
+# a4 = frame (0 ou 1)
+# -----------------------------------------------------------------------------
+# t0 = i
+# t1 = j
+# t2 = endereço do char na memória
+# t3 = metade do char (2a e depois 1a)
+# t4 = endereço para impressao
+# t5 = background color
+# t6 = foreground color
+# -----------------------------------------------------------------------------
+# t9 foi convertido para s9 pois não ha registradores temporários sobrando dentro desta função
+
+
+printChar:	li 	t4, 0xFF    # T4 temporário.
+		slli 	t4, t4, 8    # T4 = 0x0000FF00 (no RARS, não podemos fazer diretamente "andi rd, rs1, 0xFF00")
+		and    	t5, a3, t4    # T5 obtem cor de fundo.
+    		srli	t5, t5, 8    # Número da cor de fundo.
+		andi   	t6, a3, 0xFF    # T6 obtem cor de frente.
 
 		li 	tp, ' '
-		blt 	a0, tp, printChar.NAOIMPRIMIVEL	# ascii menor que 32 nao eh imprimivel
+		blt 	a0, tp, printChar.NAOIMPRIMIVEL    # Ascii menor que 32 não é imprimivel.
 		li 	tp, '~'
-		bgt	a0, tp, printChar.NAOIMPRIMIVEL	# ascii Maior que 126  nao eh imprimivel
+		bgt	a0, tp, printChar.NAOIMPRIMIVEL    # Ascii Maior que 126  não é imprimivel.
     		j       printChar.IMPRIMIVEL
     
-printChar.NAOIMPRIMIVEL: li      a0, 32		# Imprime espaco
+printChar.NAOIMPRIMIVEL: li      a0, 32    # a0 recebe o caractere de espaço usado como substituto.
 
-printChar.IMPRIMIVEL:	li	tp, NUMCOLUNAS		# Num colunas 320
+printChar.IMPRIMIVEL:	li	tp, NUMCOLUNAS    # Num colunas 320.
 			TEM_M(s8,printChar.mul1)
 			MULTIPLY(t4,tp,a2)
 			j printChar.mul1d
-printChar.mul1:		mul     t4, tp, a2			# multiplica a2x320  t4 = coordenada y
-printChar.mul1d:	add     t4, t4, a1               	# t4 = 320*y + x
-			addi    t4, t4, 7                 	# t4 = 320*y + (x+7)
-			li      tp, VGAADDRESSINI0          	# Endereco de inicio da memoria VGA0
-			beq 	a4, zero, printChar.PULAFRAME		# Verifica qual o frame a ser usado em a4
-			li      tp, VGAADDRESSINI1          	# Endereco de inicio da memoria VGA1
-printChar.PULAFRAME:	add     t4, t4, tp               	# t4 = endereco de impressao do ultimo pixel da primeira linha do char
-			addi    t2, a0, -32               	# indice do char na memoria
-			slli    t2, t2, 3                 	# offset em bytes em relacao ao endereco inicial
-			la      t3, LabelTabChar		# endereco dos caracteres na memoria
-			add     t2, t2, t3               	# endereco do caractere na memoria
-			lw      t3, 0(t2)                 	# carrega a primeira word do char
-			li 	t0, 4				# i=4
+printChar.mul1:		mul     t4, tp, a2    # Multiplica a2x320  t4 = coordenada y.
+printChar.mul1d:	add     t4, t4, a1    # T4 = 320*y + x.
+			addi    t4, t4, 7    # T4 = 320*y + (x+7)
+			li      tp, VGAADDRESSINI0    # Endereço de início da memória VGA0.
+			beq 	a4, zero, printChar.PULAFRAME    # Verifica qual o frame a ser usado em a4.
+			li      tp, VGAADDRESSINI1    # Endereço de início da memória VGA1.
+printChar.PULAFRAME:	add     t4, t4, tp    # T4 = endereço de impressao do último pixel da primeira linha do char.
+			addi    t2, a0, -32    # Indice do char na memória.
+			slli    t2, t2, 3    # Offset em bytes em relacao ao endereço inicial.
+			la      t3, LabelTabChar    # Endereço dos caracteres na memória.
+			add     t2, t2, t3    # Endereço do caractere na memória.
+			lw      t3, 0(t2)    # Carrega a primeira word do char.
+			li 	t0, 4    # I=4.
 
-printChar.forChar1I:	beq     t0, zero, printChar.endForChar1I # if(i == 0) end for i
-    			addi    t1, zero, 8               	# j = 8
+printChar.forChar1I:	beq     t0, zero, printChar.endForChar1I    # If(i == 0) end for i.
+    			addi    t1, zero, 8    # Trecho desativado, mantido para consulta: j = 8.
 
-printChar.forChar1J:	beq     t1, zero, printChar.endForChar1J # if(j == 0) end for j
-        		andi    s9, t3, 0x001			# primeiro bit do caracter
-        		srli    t3, t3, 1             		# retira o primeiro bit
-        		beq     s9, zero, printChar.printCharPixelbg1	# pixel eh fundo?
-        		sb      t6, 0(t4)             		# imprime pixel com cor de frente
+printChar.forChar1J:	beq     t1, zero, printChar.endForChar1J    # If(j == 0) end for j.
+        		andi    s9, t3, 0x001    # Primeiro bit do caracter.
+        		srli    t3, t3, 1    # Retira o primeiro bit.
+        		beq     s9, zero, printChar.printCharPixelbg1    # Pixel é fundo?
+        		sb      t6, 0(t4)    # Imprime pixel com cor de frente.
         		j       printChar.endCharPixel1
-printChar.printCharPixelbg1:	sb      t5, 0(t4)                # imprime pixel com cor de fundo
-printChar.endCharPixel1: addi    t1, t1, -1                	# j--
-    			addi    t4, t4, -1                	# t4 aponta um pixel para a esquerda
-    			j       printChar.forChar1J		# vollta novo pixel
+printChar.printCharPixelbg1:	sb      t5, 0(t4)    # Imprime pixel com cor de fundo.
+printChar.endCharPixel1: addi    t1, t1, -1    # Trecho desativado, mantido para consulta: j--.
+    			addi    t4, t4, -1    # T4 aponta um pixel para a esquerda.
+    			j       printChar.forChar1J    # Vollta novo pixel.
 
-printChar.endForChar1J: addi    t0, t0, -1 		# i--
-    			addi    t4, t4, 328           	# 2**12 + 8
-    			j       printChar.forChar1I	# volta ao loop
+printChar.endForChar1J: addi    t0, t0, -1    # I--.
+    			addi    t4, t4, 328    # 2**12 + 8.
+    			j       printChar.forChar1I    # Volta ao loop.
 
-printChar.endForChar1I:	lw      t3, 4(t2)           	# carrega a segunda word do char
-			li 	t0, 4			# i = 4
-printChar.forChar2I:    beq     t0, zero, printChar.endForChar2I  # if(i == 0) end for i
-    			addi    t1, zero, 8             # j = 8
+printChar.endForChar1I:	lw      t3, 4(t2)    # Carrega a segunda word do char.
+			li 	t0, 4    # I = 4.
+printChar.forChar2I:    beq     t0, zero, printChar.endForChar2I    # If(i == 0) end for i.
+    			addi    t1, zero, 8    # Trecho desativado, mantido para consulta: j = 8.
 
-printChar.forChar2J:	beq	t1, zero, printChar.endForChar2J # if(j == 0) end for j
-        		andi    s9, t3, 0x001	    		# pixel a ser impresso
-        		srli    t3, t3, 1                 	# desloca para o proximo
-        		beq     s9, zero, printChar.printCharPixelbg2 # pixel eh fundo?
-        		sb      t6, 0(t4)			# imprime cor frente
-        		j       printChar.endCharPixel2		# volta ao loop
+printChar.forChar2J:	beq	t1, zero, printChar.endForChar2J    # If(j == 0) end for j.
+        		andi    s9, t3, 0x001    # Pixel a ser impresso.
+        		srli    t3, t3, 1    # Desloca para o próximo.
+        		beq     s9, zero, printChar.printCharPixelbg2    # Pixel é fundo?
+        		sb      t6, 0(t4)    # Imprime cor frente.
+        		j       printChar.endCharPixel2    # Volta ao loop.
 
-printChar.printCharPixelbg2:	sb      t5, 0(t4)		# imprime cor de fundo
+printChar.printCharPixelbg2:	sb      t5, 0(t4)    # Imprime cor de fundo.
 
-printChar.endCharPixel2:	addi    t1, t1, -1		# j--
-    				addi    t4, t4, -1              # t4 aponta um pixel para a esquerda
+printChar.endCharPixel2:	addi    t1, t1, -1    # Trecho desativado, mantido para consulta: j--.
+    				addi    t4, t4, -1    # T4 aponta um pixel para a esquerda.
     				j       printChar.forChar2J
 
-printChar.endForChar2J:	addi	t0, t0, -1 		# i--
-    			addi    t4, t4, 328		#
-    			j       printChar.forChar2I	# volta ao loop
+printChar.endForChar2J:	addi	t0, t0, -1    # I--.
+    			addi    t4, t4, 328    # Separador visual.
+    			j       printChar.forChar2I    # Volta ao loop.
 
-printChar.endForChar2I:	ret				# retorna
+printChar.endForChar2I:	ret    # Retorna.
 
 
-#########################################
-# ReadChar           			#
-# a0 = valor ascii da tecla   		#
-# 2017/2  				#
-######################################### 
+# -----------------------------------------------------------------------------
+# ReadChar
+# a0 = valor ascii da tecla
+# 2017/2
+# -----------------------------------------------------------------------------
 
 readChar: 		nop
-#DE1(s8,readCharDE2)   # Eh necessario mesmo???
+# DE1(s8,readCharDE2)   # é necessario mesmo???
 
-##### Tratamento para uso com o Keyboard Display MMIO Tool do Rars
-readCharKDMMIO:		li 	t0, KDMMIO_Ctrl			# Execucao com Polling do KD MMIO
+# Tratamento para uso com o Keyboard Display MMIO Tool do Rars
+readCharKDMMIO:		li 	t0, KDMMIO_Ctrl    # Execução com Polling do KD MMIO.
 
-loopReadCharKDMMIO:  	lw     	a0, 0(t0)   			# le o bit de flag do teclado
-			andi 	a0, a0, 0x0001			# mascara bit 0
-			beqz    a0, loopReadCharKDMMIO  	# testa se uma tecla foi pressionada
-   			lw 	a0, 4(t0)			# le o ascii da tecla pressionada
-			j fimreadChar				# fim Read Char
+loopReadCharKDMMIO:  	lw     	a0, 0(t0)    # Lê o bit de flag do teclado.
+			andi 	a0, a0, 0x0001    # Mascara bit 0.
+			beqz    a0, loopReadCharKDMMIO    # Testa se uma tecla foi pressionada.
+   			lw 	a0, 4(t0)    # Lê o ascii da tecla pressionada.
+			j fimreadChar    # Fim Read Char.
 
 										
-##### Tratamento para uso com o teclado PS2 da DE2 usando Buffer0 teclado
-#### muda a0, t0,t1,t2,t3 e s0
-#### Cuidar: ao entrar s0 ja deve conter o endereco la s0,LabelScanCode  #####
-readCharDE2:  	li      t0, Buffer0Teclado 			# Endereco buffer0
-    		lw     	t1, 0(t0)				# conteudo inicial do buffer
+# Tratamento para uso com o teclado PS2 da DE2 usando Buffer0 teclado
+# muda a0, t0,t1,t2,t3 e s0
+# --- Cuidar: ao entrar s0 já deve conter o endereço la s0,LabelScanCode ---
+readCharDE2:  	li      t0, Buffer0Teclado    # Endereço buffer0.
+    		lw     	t1, 0(t0)    # Conteudo inicial do buffer.
 	
-loopReadChar:  	lw     	t2, 0(t0)   				# le buffer teclado
-		bne     t2, t1, buffermodificadoChar    	# testa se o buffer foi modificado
+loopReadChar:  	lw     	t2, 0(t0)    # Lê buffer teclado.
+		bne     t2, t1, buffermodificadoChar    # Testa se o buffer foi modificado.
 
-atualizaBufferChar:  mv t1, t2			# atualiza o buffer com o novo valor
-    		j       loopReadChar		# loop de principal de leitura 
+atualizaBufferChar:  mv t1, t2    # Atualiza o buffer com o novo valor.
+    		j       loopReadChar    # Loop de principal de leitura.
 
 buffermodificadoChar:	li t5, 0xFF
-	slli 	t5, t5, 8			# t5 = 0x0000FF00
-	and    	t3, t2, t5 			# mascara o 2o scancode
+	slli 	t5, t5, 8    # T5 = 0x0000FF00.
+	and    	t3, t2, t5    # Mascara o 2o scancode.
 	li 	tp, 0x0000F000
-	beq     t3, tp, teclasoltaChar		# eh 0xF0 no 2o scancode? tecla foi solta
+	beq     t3, tp, teclasoltaChar    # É 0xF0 no 2o scancode? tecla foi solta.
 	li	tp, 0x000000FF
-	and	t3, t2, tp			# mascara 1o scancode	(essa podemos fazer diretamente)
+	and	t3, t2, tp    # Mascara 1o scancode	(essa podemos fazer diretamente)
 	li	tp, 0x00000012
-    	bne 	t3, tp, atualizaBufferChar	# nao eh o SHIFT que esta pressionado ? volta a ler 
-	la      s0, LabelScanCodeShift		# se for SHIFT que esta pressionado atualiza o endereco da tabel
-    	j       atualizaBufferChar		# volta a ler
+    	bne 	t3, tp, atualizaBufferChar    # Não é o SHIFT que esta pressionado ? volta a ler.
+	la      s0, LabelScanCodeShift    # Se for SHIFT que esta pressionado atualiza o endereço da tabel.
+    	j       atualizaBufferChar    # Volta a ler.
 
-teclasoltaChar:		andi t3, t2, 0x00FF		# mascara o 1o scancode
+teclasoltaChar:		andi t3, t2, 0x00FF    # Mascara o 1o scancode.
 	li	tp, 0x00000080
-  	bgt	t3, tp, atualizaBufferChar		# se o scancode for > 0x80 entao nao eh imprimivel!
+  	bgt	t3, tp, atualizaBufferChar    # Se o scancode for > 0x80 entao não é imprimivel!
   	li	tp, 0x00000012
-	bne 	t3, tp, naoehshiftChar			# nao foi o shift que foi solto? entao processa
-	la 	s0, LabelScanCode			# shift foi solto atualiza o endereco da tabela
-	j 	atualizaBufferChar			# volta a ler
+	bne 	t3, tp, naoehshiftChar    # Não foi o shift que foi solto? entao processa.
+	la 	s0, LabelScanCode    # Shift foi solto atualiza o endereço da tabela.
+	j 	atualizaBufferChar    # Volta a ler.
 	
-naoehshiftChar:	   	add     t3, s0, t3              # endereco na tabela de scancode da tecla com ou sem shift
-    	lb      a0, 0(t3)				# le o ascii do caracter para a0
-    	beq     a0, zero, atualizaBufferChar		# se for caractere nao imprimivel volta a ler
+naoehshiftChar:	   	add     t3, s0, t3    # Endereço na tabela de scancode da tecla com ou sem shift.
+    	lb      a0, 0(t3)    # Lê o ascii do caracter para a0.
+    	beq     a0, zero, atualizaBufferChar    # Se for caractere não imprimivel volta a ler.
     	
-fimreadChar: 	ret			# retorna
+fimreadChar: 	ret    # Retorna.
 	
-#########################################
-#    ReadString         	 	#
-# a0 = end Inicio      	 		#
-# a1 = tam Max String 		 	#
-# a2 = end do ultimo caractere	 	#
-# a3 = num de caracteres digitados	#
-# 2018/1     2019/2           		#
-#########################################
-# muda a2, a3, s2 e s0  
+# -----------------------------------------------------------------------------
+# ReadString
+# a0 = end início
+# a1 = tam Max String
+# a2 = end do último caractere
+# a3 = num de caracteres digitados
+# 2018/1     2019/2
+# -----------------------------------------------------------------------------
+# muda a2, a3, s2 e s0
 
-readString: 	addi 	sp, sp, -8			# reserva espaco na pilha
-		sw 	s0, 4(sp)			# salva s0
-		sw 	ra, 0(sp)			# salva ra
-		li 	a3, 0				# zera o contador de caracteres digitados
-		mv 	s2, a0				# salva o endereco inicial
-    		la      s0, LabelScanCode      		# Endereco da tabela de scancode inicial para readChar
+readString: 	addi 	sp, sp, -8    # Reserva espaco na pilha.
+		sw 	s0, 4(sp)    # Preserva s0.
+		sw 	ra, 0(sp)    # Preserva ra, que contém o endereço de retorno.
+		li 	a3, 0    # Zera o contador de caracteres digitados.
+		mv 	s2, a0    # Preserva o endereço inicial.
+    		la      s0, LabelScanCode    # Endereço da tabela de scancode inicial para readChar.
     		
-loopreadString: beq 	a1, a3, fimreadString   	# buffer cheio fim
+loopreadString: beq 	a1, a3, fimreadString    # Buffer cheio fim.
 	
 		addi 	sp, sp, -8
-		sw 	ra, 0(sp)			# salva ra
-		sw 	a0, 4(sp)			# salva a0 pois ele sera reescrito em readChar
-		jal 	readChar			# le um caracter do teclado (retorno em a0)
-		mv 	t6, a0				# t6 eh a letra lida em readChar
+		sw 	ra, 0(sp)    # Preserva ra, que contém o endereço de retorno.
+		sw 	a0, 4(sp)    # Preserva a0 pois ele será reescrito em readChar.
+		jal 	readChar    # Lê um caracter do teclado (retorno em a0)
+		mv 	t6, a0    # T6 é a letra lida em readChar.
 		lw 	ra, 0(sp)
 		lw 	a0, 4(sp)
 		addi 	sp, sp, 8
 
 		li 	tp, 0x08			
-		bne	t6, tp, PulaBackSpace		# Se nao for BACKSPACE
-		beq	zero, a3, loopreadString	# Se n�o tem nenhum caractere no buffer apenas volta a ler
-		addi	a3, a3, -1			# diminui contador
-		addi 	a0, a0, -1			# diminui endereco do buffer
-		sb 	zero, 0(a0)			# coloca zero no caractere anterior
+		bne	t6, tp, PulaBackSpace    # Se não for BACKSPACE.
+		beq	zero, a3, loopreadString    # Se não tem nenhum caractere no buffer apenas volta a ler.
+		addi	a3, a3, -1    # Diminui contador.
+		addi 	a0, a0, -1    # Diminui endereço do buffer.
+		sb 	zero, 0(a0)    # Coloca zero no caractere anterior.
 		j loopreadString
 		
 PulaBackSpace:	li	tp, 0x0A
-		beq 	t6, tp, fimreadString		# se for tecla ENTER fim
-		sb 	t6, 0(a0)			# grava no buffer
-		addi 	a3, a3, 1			# incrementa contador
-		addi 	a0, a0, 1			# incrementa endereco no buffer
-		j loopreadString			# volta a ler outro caractere
+		beq 	t6, tp, fimreadString    # Se for tecla ENTER fim.
+		sb 	t6, 0(a0)    # Grava no buffer.
+		addi 	a3, a3, 1    # Incrementa contador.
+		addi 	a0, a0, 1    # Incrementa endereço no buffer.
+		j loopreadString    # Volta a ler outro caractere.
 	
-fimreadString: 	sb 	zero, 0(a0)			# grava NULL no buffer
-		addi 	a2, a0, -1			# Para que a2 tenha o endereco do ultimo caractere digitado
-		mv	a0, s2				# a0 volta a ter o endereco inicial da string
-		lw 	ra, 0(sp)			# recupera ra
-		lw	s0, 4(sp)			# recupera s0
-		addi 	sp, sp, 8			# libera espaco
-		ret					# retorna
+fimreadString: 	sb 	zero, 0(a0)    # Grava NULL no buffer.
+		addi 	a2, a0, -1    # Para que a2 tenha o endereço do último caractere digitado.
+		mv	a0, s2    # A0 volta a ter o endereço inicial da string.
+		lw 	ra, 0(sp)    # Recupera ra antes de voltar ao chamador.
+		lw	s0, 4(sp)    # Recupera s0.
+		addi 	sp, sp, 8    # Libera o espaço reservado na pilha.
+		ret    # Retorna.
 	
 	
-###########################
-#    ReadInt              #
-# a0 = valor do inteiro   #
-#                         #
-###########################
+# -----------------------------------------------------------------------------
+# ReadInt
+# a0 = valor do inteiro
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-readInt: 	addi 	sp,sp,-4		# reserva espaco na pilha
-	sw 	ra, 0(sp)			# salva ra
-	la 	a0, TempBuffer			# Endereco do buffer de string
-	li 	a1, 10				# numero maximo de digitos
-	jal 	readString			# le uma string de ate 10 digitos, a3 numero de digitos
-	mv 	t0, a2				# copia endereco do ultimo digito
-	li 	t2, 10				# dez
-	li 	t3, 1				# dezenas, centenas, etc
-	mv 	a0, zero			# zera o numero
+readInt: 	addi 	sp,sp,-4    # Reserva espaco na pilha.
+	sw 	ra, 0(sp)    # Preserva ra, que contém o endereço de retorno.
+	la 	a0, TempBuffer    # Endereço do buffer de string.
+	li 	a1, 10    # Número máximo de digitos.
+	jal 	readString    # Lê uma string de até 10 digitos, a3 número de digitos.
+	mv 	t0, a2    # Copia endereço do último digito.
+	li 	t2, 10    # Dez.
+	li 	t3, 1    # Dezenas, centenas, etc.
+	mv 	a0, zero    # Zera o número.
 	
-loopReadInt: 	beq	a3,zero, fimReadInt	# Leu todos os digitos
-	lb 	t1, (t0)			# le um digito
+loopReadInt: 	beq	a3,zero, fimReadInt    # Leu todos os digitos.
+	lb 	t1, (t0)    # Lê um digito.
 	li	tp, 0x0000002D
-	beq 	t1, tp, ehnegReadInt		# = '-'
+	beq 	t1, tp, ehnegReadInt    # = '-'.
 	li	tp, 0x0000002B
-	beq 	t1, tp, ehposReadInt		# = '+'
+	beq 	t1, tp, ehposReadInt    # = '+'.
 	li	tp, 0x00000030
-	blt 	t1, tp, naoehReadInt		# <'0'
+	blt 	t1, tp, naoehReadInt    # <'0'.
 	li	tp, 0x00000039
-	bgt 	t1, tp, naoehReadInt		# >'9'
-	addi 	t1, t1, -48			# transforma ascii em numero
+	bgt 	t1, tp, naoehReadInt    # >'9'.
+	addi 	t1, t1, -48    # Transforma ascii em número.
 	TEM_M(s8,readInt.mul1)
 	MULTIPLY(t1,t1,t3)
 	j readInt.mul1d
-readInt.mul1: 	mul 	t1, t1, t3			# multiplica por dezenas/centenas
-readInt.mul1d:	add 	a0, a0, t1			# soma no numero
+readInt.mul1: 	mul 	t1, t1, t3    # Multiplica por dezenas/centenas.
+readInt.mul1d:	add 	a0, a0, t1    # Soma no número.
 	TEM_M(s8,readInt.mul2)
 	MULTIPLY(t3,t3,t2)
 	j readInt.mul2d
-readInt.mul2: 	mul 	t3, t3, t2			# proxima dezena/centena
-readInt.mul2d:	addi 	t0, t0, -1			# busca o digito anterior
-	addi	a3, a3, -1			# reduz o contador de digitos 
-	j 	loopReadInt			# volta para buscar proximo digito
+readInt.mul2: 	mul 	t3, t3, t2    # Proxima dezena/centena.
+readInt.mul2d:	addi 	t0, t0, -1    # Busca o digito anterior.
+	addi	a3, a3, -1    # Reduz o contador de digitos.
+	j 	loopReadInt    # Volta para buscar próximo digito.
 
-naoehReadInt:	#j instructionException		# gera erro "instrucao invalida"
-		j fimReadInt			# como nao esta implmentado apenas retorna
+naoehReadInt:    # Trecho desativado, mantido para consulta: j instructionException		# gera erro "instrução invalida".
+		j fimReadInt    # Como não esta implmentado apenas retorna.
 
-ehnegReadInt:	sub a0,zero,a0			# se for negativo
+ehnegReadInt:	sub a0,zero,a0    # Se for negativo.
 
-ehposReadInt:					# se for positivo so retorna
+ehposReadInt:    # Se for positivo só retorna.
 
-fimReadInt:	lw 	ra, 0(sp)		# recupera ra
-		addi 	sp, sp, 4		# libera espaco
-		ret				# fim ReadInt
-
-
-###########################################
-#        MidiOut 31 (2015/1)              #
-#  a0 = pitch (0-127)                     #
-#  a1 = duration in milliseconds          #
-#  a2 = instrument (0-15)                 #
-#  a3 = volume (0-127)                    #
-###########################################
+fimReadInt:	lw 	ra, 0(sp)    # Recupera ra antes de voltar ao chamador.
+		addi 	sp, sp, 4    # Libera o espaço reservado na pilha.
+		ret    # Fim ReadInt.
 
 
-#################################################################################################
-#
+# -----------------------------------------------------------------------------
+# MidiOut 31 (2015/1)
+# a0 = pitch (0-127)
+# a1 = duration in milliseconds
+# a2 = instrument (0-15)
+# a3 = volume (0-127)
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Note Data           = 32 bits     |   1'b - Melody   |   4'b - Instrument   |   7'b - Volume   |   7'b - Pitch   |   1'b - End   |   1'b - Repeat   |   11'b - Duration   |
-#
+# -----------------------------------------------------------------------------
 # Note Data (ecall) = 32 bits     |   1'b - Melody   |   4'b - Instrument   |   7'b - Volume   |   7'b - Pitch   |   13'b - Duration   |
-#
-#################################################################################################
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 midiOut:
 	DE1(s8,midiOutDE2)
 	
-	li a7,31		# Chama o ecall normal
+	li a7,31    # Chama o ecall normal.
 	ecall
 	j fimmidiOut
 
@@ -1031,29 +1031,29 @@ midiOutDE2:	li      t0, NoteData
 
     		# Melody = 0
 
-    		# Definicao do Instrumento
+    		# Definição do Instrumento
    	 	andi    t2, a2, 0x0000000F
     		slli    t2, t2, 27
     		or      t1, t1, t2
 
-    		# Definicao do Volume
+    		# Definição do Volume
     		andi    t2, a3, 0x0000007F
     		slli    t2, t2, 20
     		or      t1, t1, t2
 
-    		# Definicao do Pitch
+    		# Definição do Pitch
     		andi    t2, a0, 0x0000007F
     		slli    t2, t2, 13
     		or      t1, t1, t2
 
-    		# Definicao da Duracao
+    		# Definição da duração
 		li 	t4, 0x1FF
 		slli 	t4, t4, 4
-		addi 	t4, t4, 0x00F			# t4 = 0x00001FFF
+		addi 	t4, t4, 0x00F    # T4 = 0x00001FFF.
     		and    	t2, a1, t4
     		or      t1, t1, t2
 
-    		# Guarda a definicao da duracao da nota na Word 1
+    		# Guarda a definição da duração da nota na Word 1
     		j       SintMidOut
 
 SintMidOut:	sw	t1, 0(t0)
@@ -1065,25 +1065,25 @@ Check_AUD_DACLRCK:     	lw      t3, 0(t2)
 
 fimmidiOut:    		ret
 
-###########################################
-#        MidiOut 33 (2015/1)              #
-#  a0 = pitch (0-127)                     #
-#  a1 = duration in milliseconds          #
-#  a2 = instrument (0-127)                #
-#  a3 = volume (0-127)                    #
-###########################################
+# -----------------------------------------------------------------------------
+# MidiOut 33 (2015/1)
+# a0 = pitch (0-127)
+# a1 = duration in milliseconds
+# a2 = instrument (0-127)
+# a3 = volume (0-127)
+# -----------------------------------------------------------------------------
 
-#################################################################################################
-#
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Note Data             = 32 bits     |   1'b - Melody   |   4'b - Instrument   |   7'b - Volume   |   7'b - Pitch   |   1'b - End   |   1'b - Repeat   |   8'b - Duration   |
-#
+# -----------------------------------------------------------------------------
 # Note Data (ecall)   	= 32 bits     |   1'b - Melody   |   4'b - Instrument   |   7'b - Volume   |   7'b - Pitch   |   13'b - Duration   |
-#
-#################################################################################################
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 midiOutSync:
 	DE1(s8,midiOutSyncDE2)
 	
-	li a7,33		# Chama o ecall normal
+	li a7,33    # Chama o ecall normal.
 	ecall
 	j fimmidiOutSync
 	
@@ -1094,29 +1094,29 @@ midiOutSyncDE2:	li      t0, NoteData
     		lui    	t1, 0x08000
 		slli	t1,t1,4
 		
-    		# Definicao do Instrumento
+    		# Definição do Instrumento
     		andi    t2, a2, 0x00F
     		slli    t2, t2, 27
     		or      t1, t1, t2
 
-    		# Definicao do Volume
+    		# Definição do Volume
     		andi    t2, a3, 0x07F
     		slli    t2, t2, 20
     		or      t1, t1, t2
 
-    		# Definicao do Pitch
+    		# Definição do Pitch
     		andi    t2, a0, 0x07F
     		slli    t2, t2, 13
     		or      t1, t1, t2
 
-    		# Definicao da Duracao
+    		# Definição da duração
 		li 	t4, 0x1FF
 		slli 	t4, t4, 4
-		addi 	t4, t4, 0x00F			# t4 = 0x00001FFF
+		addi 	t4, t4, 0x00F    # T4 = 0x00001FFF.
     		and    	t2, a1, t4
     		or      t1, t1, t2
 
-    		# Guarda a definicao da duracao da nota na Word 1
+    		# Guarda a definição da duração da nota na Word 1
     		j       SintMidOutSync
 
 SintMidOutSync:	sw	t1, 0(t0)
@@ -1134,180 +1134,180 @@ Melody:     	lw      t5, 0(t4)
 fimmidiOutSync:	ret
 
 
-#################################
-# printFloat                    #
-# imprime Float em fa0          #
-# na posicao (a1,a2)	cor a3  #
-#################################
+# -----------------------------------------------------------------------------
+# printFloat
+# imprime Float em fa0
+# na posição (a1,a2)	cor a3
+# -----------------------------------------------------------------------------
 # muda s0, s1
 
 printFloat:	addi 	sp, sp, -4
-		sw 	ra, 0(sp)				# salva ra
+		sw 	ra, 0(sp)    # Preserva ra, que contém o endereço de retorno.
 		la 	s0, TempBuffer
 
-		# Encontra o sinal do numero e coloca no Buffer
-		li 	t0, '+'			# define sinal '+'
-		fmv.x.s s1, fa0			# recupera o numero float sem conversao
-		srli	s1, s1, 31		# bit 31(sinal) em bit 0, numero eh negativo s1=1
-		beq 	s1, zero, ehposprintFloat	# eh positivo s1=0
-		li 	t0, '-'				# define sinal '-'
-ehposprintFloat: sb 	t0, 0(s0)			# coloca sinal no buffer
-		addi 	s0, s0, 1			# incrementa o endereco do buffer
+		# Encontra o sinal do número e coloca no Buffer
+		li 	t0, '+'    # Define sinal '+'.
+		fmv.x.s s1, fa0    # Recupera o número float sem conversao.
+		srli	s1, s1, 31    # Bit 31(sinal) em bit 0, número é negativo s1=1.
+		beq 	s1, zero, ehposprintFloat    # É positivo s1=0.
+		li 	t0, '-'    # Define sinal '-'.
+ehposprintFloat: sb 	t0, 0(s0)    # Coloca sinal no buffer.
+		addi 	s0, s0, 1    # Incrementa o endereço do buffer.
 
 		# Encontra o expoente em t0
-		 fmv.x.s t0, fa0			# recupera o numero float sem conversao
+		 fmv.x.s t0, fa0    # Recupera o número float sem conversao.
 		 lui	t1, 0x7F800
-		 and 	t0, t0, t1   			# mascara com 0111 1111 1000 0000 0000 0000...
-		 slli 	t0, t0, 1			# tira o sinal do numero
-		 srli 	t0, t0, 24			# recupera o expoente
+		 and 	t0, t0, t1    # Mascara com 0111 1111 1000 0000 0000 0000...
+		 slli 	t0, t0, 1    # Tira o sinal do número.
+		 srli 	t0, t0, 24    # Recupera o expoente.
 
 		# Encontra a fracao em t1
-		fmv.x.s t1, fa0				# recupera o numero float sem conversao
-		li 	t2, 0x007FFFFF			# t2 = 0x007FFFFF
-		and 	t1, t1, t2			# mascara com 0000 0000 0111 1111 1111... 		 
+		fmv.x.s t1, fa0    # Recupera o número float sem conversao.
+		li 	t2, 0x007FFFFF    # T2 = 0x007FFFFF.
+		and 	t1, t1, t2    # Mascara com 0000 0000 0111 1111 1111...
 			 
-		beq 	t0, zero, ehExp0printFloat	# Expoente = 0
-		li	tp, 0x000000FF			# TP = 255
-		beq 	t0, tp, ehExp255printFloat	# Expoente = 255
+		beq 	t0, zero, ehExp0printFloat    # Expoente = 0.
+		li	tp, 0x000000FF    # TP = 255.
+		beq 	t0, tp, ehExp255printFloat    # Expoente = 255.
 		
-		# Eh um numero float normal  t0 eh o expoente e t1 eh a fracao!
+		# É um número float normal  t0 é o expoente e t1 é a fracao!
 		# Encontra o E tal que 10^E <= x <10^(E+1)
-		fabs.s 		ft0, fa0		# ft0 recebe o modulo  de x
+		fabs.s 		ft0, fa0    # Ft0 recebe o modulo  de x.
 		li		tp, 1
-		fcvt.s.w 	ft1, tp			# ft1 recebe o numero 1.0
+		fcvt.s.w 	ft1, tp    # Ft1 recebe o número 1.0.
 		li		tp, 10
-		fcvt.s.w 	ft6, tp			# ft6 recebe o numero 10.0
+		fcvt.s.w 	ft6, tp    # Ft6 recebe o número 10.0.
 		li		tp, 2
 		fcvt.s.w 	ft8, tp
-		fdiv.s		ft7, ft1, ft8		# ft7 recebe o numero 0.5
+		fdiv.s		ft7, ft1, ft8    # Ft7 recebe o número 0.5.
 		
-		flt.s 	t4, ft0, ft1		# ft0 < 1.0 ? Se sim, E deve ser negativo
-		bnez	t4, menor1printFloat	# se a comparacao deu true (1), pula
-		fmv.s 	ft2, ft6		# ft2  fator de multiplicacao = 10
-		j 	cont2printFloat		# vai para expoente positivo
-menor1printFloat: fdiv.s ft2,ft1,ft6		# ft2 fator multiplicativo = 0.1
+		flt.s 	t4, ft0, ft1    # Ft0 < 1.0 ? Se sim, E deve ser negativo.
+		bnez	t4, menor1printFloat    # Se a comparação deu true (1), pula.
+		fmv.s 	ft2, ft6    # Ft2  fator de multiplicação = 10.
+		j 	cont2printFloat    # Vai para expoente positivo.
+menor1printFloat: fdiv.s ft2,ft1,ft6    # Ft2 fator multiplicativo = 0.1.
 
-			# calcula o expoente negativo de 10
-cont1printFloat: 	fmv.s 	ft4, ft0			# inicia com o numero x 
-		 	fmv.s 	ft3, ft1			# contador comeca em 1
-loop1printFloat: 	fdiv.s 	ft4, ft4, ft2			# divide o numero pelo fator multiplicativo
-		 	fle.s 	t3, ft4, ft1			# o numero eh > que 1? entao fim
+			# Calcula o expoente negativo de 10
+cont1printFloat: 	fmv.s 	ft4, ft0    # Inicia com o número x.
+		 	fmv.s 	ft3, ft1    # Contador comeca em 1.
+loop1printFloat: 	fdiv.s 	ft4, ft4, ft2    # Divide o número pelo fator multiplicativo.
+		 	fle.s 	t3, ft4, ft1    # O número é > que 1? entao fim.
 		 	beq 	t3,zero, fimloop1printFloat
-		 	fadd.s 	ft3, ft3, ft1			# incrementa o contador
-		 	j 	loop1printFloat			# volta ao loop
+		 	fadd.s 	ft3, ft3, ft1    # Incrementa o contador.
+		 	j 	loop1printFloat    # Volta ao loop.
 		 	
-fimloop1printFloat: 	fdiv.s 	ft4, ft4, ft2			# ajusta o numero
-		 	j 	intprintFloat			# vai para imprimir a parte inteira
+fimloop1printFloat: 	fdiv.s 	ft4, ft4, ft2    # Ajusta o número.
+		 	j 	intprintFloat    # Vai para imprimir a parte inteira.
 
-			# calcula o expoente positivo de 10
-cont2printFloat:	fmv.s 	 ft4, ft0			# inicia com o numero x 
-		 	fcvt.s.w ft3, zero			# contador comeca em 0
-loop2printFloat:  	flt.s 	 t3, ft4, ft6			# resultado eh < que 10? entao fim
-			fdiv.s 	 ft4, ft4, ft2			# divide o numero pelo fator multiplicativo
+			# Calcula o expoente positivo de 10
+cont2printFloat:	fmv.s 	 ft4, ft0    # Inicia com o número x.
+		 	fcvt.s.w ft3, zero    # Contador comeca em 0.
+loop2printFloat:  	flt.s 	 t3, ft4, ft6    # Resultado é < que 10? entao fim.
+			fdiv.s 	 ft4, ft4, ft2    # Divide o número pelo fator multiplicativo.
 			bne 	 t3, zero, intprintFloat
-		 	fadd.s 	 ft3, ft3, ft1			# incrementa o contador
+		 	fadd.s 	 ft3, ft3, ft1    # Incrementa o contador.
 		 	j 	 loop2printFloat
 
-		# Neste ponto tem-se em t4 se ft0<1, em ft3 o expoente de 10 e ft0 0 modulo do numero e s1 o sinal
-		# e em ft4 um numero entre 1 e 10 que multiplicado por Ef3 deve voltar ao numero		
+		# Neste ponto tem-se em t4 se ft0<1, em ft3 o expoente de 10 e ft0 0 modulo do número e s1 o sinal
+		# e em ft4 um número entre 1 e 10 que multiplicado por Ef3 deve voltar ao número
 		
-	  		# imprime parte inteira (o sinal ja esta no buffer)
-intprintFloat:		fmul.s 		ft4, ft4, ft2		# ajusta o numero
-			fsub.s		ft4, ft4, ft7		# tira 0.5, dessa forma sempre ao converter estaremos fazendo floor
-		  	fcvt.w.s	t0, ft4			# coloca floor de ft4 em t0
-			fadd.s		ft4, ft4, ft7		# readiciona 0.5
-			bnez		t0, pulaeh1print	# para corrigir multiplos inteiros de 10!
+	  		# Imprime parte inteira (o sinal já esta no buffer)
+intprintFloat:		fmul.s 		ft4, ft4, ft2    # Ajusta o número.
+			fsub.s		ft4, ft4, ft7    # Tira 0.5, dessa forma sempre ao converter estaremos fazendo floor.
+		  	fcvt.w.s	t0, ft4    # Coloca floor de ft4 em t0.
+			fadd.s		ft4, ft4, ft7    # Readiciona 0.5.
+			bnez		t0, pulaeh1print    # Para corrigir multiplos inteiros de 10!
 			li 		t0, 1
-pulaeh1print:		addi 		t0, t0, 48		# converte para ascii			
-			sb 		t0, 0(s0)		# coloca no buffer
-		  	addi 		s0, s0, 1		# incrementta o buffer
+pulaeh1print:		addi 		t0, t0, 48    # Converte para ascii.
+			sb 		t0, 0(s0)    # Coloca no buffer.
+		  	addi 		s0, s0, 1    # Incrementta o buffer.
 		  
-		  	# imprime parte fracionaria
-		  	li 	t0, '.'				# carrega o '.'
-		  	sb 	t0, 0(s0)			# coloca no buffer
-		  	addi 	s0, s0, 1			# incrementa o buffer
+		  	# Imprime parte fracionaria
+		  	li 	t0, '.'    # Carrega o '.'.
+		  	sb 	t0, 0(s0)    # Coloca no buffer.
+		  	addi 	s0, s0, 1    # Incrementa o buffer.
 		  
-		  	# ft4 contem a mantissa com 1 casa nao decimal
-		  	li 		t1, 8				# contador de digitos  -  8 casas decimais
-loopfracprintFloat:  	beq 		t1, zero, fimfracprintFloat	# fim dos digitos?
-			fsub.s		ft4, ft4, ft7			# tira 0.5
-			fcvt.w.s 	t5, ft4				# floor de ft4
-			fadd.s		ft4, ft4, ft7			# readiciona 0.5
-			fcvt.s.w	ft5, t5				# reconverte em float so com a parte inteira
-		  	fsub.s 		ft5, ft4, ft5			# parte fracionaria
-		  	fmul.s 		ft5, ft5, ft6			# mult x 10
-			fsub.s		ft5, ft5, ft7			# tira 0.5
-			fcvt.w.s	t0, ft5				# coloca floor de ft5 em 10
-		  	addi 		t0, t0, 48			# converte para ascii
+		  	# Ft4 contem a mantissa com 1 casa não decimal
+		  	li 		t1, 8    # Contador de digitos  -  8 casas decimais.
+loopfracprintFloat:  	beq 		t1, zero, fimfracprintFloat    # Fim dos digitos?
+			fsub.s		ft4, ft4, ft7    # Tira 0.5.
+			fcvt.w.s 	t5, ft4    # Floor de ft4.
+			fadd.s		ft4, ft4, ft7    # Readiciona 0.5.
+			fcvt.s.w	ft5, t5    # Reconverte em float só com a parte inteira.
+		  	fsub.s 		ft5, ft4, ft5    # Parte fracionaria.
+		  	fmul.s 		ft5, ft5, ft6    # Mult x 10.
+			fsub.s		ft5, ft5, ft7    # Tira 0.5.
+			fcvt.w.s	t0, ft5    # Coloca floor de ft5 em 10.
+		  	addi 		t0, t0, 48    # Converte para ascii.
 		  	
 			li 		tp, 48
-			blt		t0, tp, pulaprtFloat1	# testa se eh menor que '0'
+			blt		t0, tp, pulaprtFloat1    # Testa se é menor que '0'.
 			li		tp, 57
-			ble		t0, tp, pulaprtFloat2	# testa se eh menor ou igual que '9'
-pulaprtFloat1:		li		t0, 48			# define como '0'		  			  	
+			ble		t0, tp, pulaprtFloat2    # Testa se é menor ou igual que '9'.
+pulaprtFloat1:		li		t0, 48    # Define como '0'.
 		  	
-pulaprtFloat2:	  	sb 		t0, 0(s0)			# coloca no buffer
-		  	addi 		s0, s0, 1			# incrementa endereco
-		  	addi 		t1, t1, -1			# decrementa contador
-			fadd.s		ft5, ft5, ft7			# reincrementa 0.5
-		  	fmv.s 		ft4, ft5			# coloca o numero em ft4
-		  	j 		loopfracprintFloat		# volta ao loop
+pulaprtFloat2:	  	sb 		t0, 0(s0)    # Coloca no buffer.
+		  	addi 		s0, s0, 1    # Incrementa endereço.
+		  	addi 		t1, t1, -1    # Decrementa contador.
+			fadd.s		ft5, ft5, ft7    # Reincrementa 0.5.
+		  	fmv.s 		ft4, ft5    # Coloca o número em ft4.
+		  	j 		loopfracprintFloat    # Volta ao loop.
 		  
-		  	# imprime 'E'		  
-fimfracprintFloat: 	li 	t0,'E'			# carrega 'E'
-			sb 	t0, 0(s0)		# coloca no buffer
-			addi 	s0, s0, 1		# incrementa endereco
+		  	# Imprime 'E'
+fimfracprintFloat: 	li 	t0,'E'    # Carrega 'E'.
+			sb 	t0, 0(s0)    # Coloca no buffer.
+			addi 	s0, s0, 1    # Incrementa endereço.
 			
-		  	# imprime sinal do expoente
-		  	li 	t0, '+'				# carrega '+'
-		  	beqz 	t4, expposprintFloat		# nao eh negativo?
-		  	li 	t0, '-'				# carrega '-'
-expposprintFloat: 	sb 	t0, 0(s0)			# coloca no buffer
-		  	addi 	s0, s0, 1			#incrementa endereco
+		  	# Imprime sinal do expoente
+		  	li 	t0, '+'    # Carrega '+'.
+		  	beqz 	t4, expposprintFloat    # Não é negativo?
+		  	li 	t0, '-'    # Carrega '-'.
+expposprintFloat: 	sb 	t0, 0(s0)    # Coloca no buffer.
+		  	addi 	s0, s0, 1    # Incrementa endereço.
 				    
-		  	# imprimeo expoente com 2 digitos (maximo E+38)
-			li 	t1, 10				# carrega 10	
-			fcvt.w.s  tp, ft3			# passa ft3 para t0
-			div 	t0, tp, t1			# divide por 10 (dezena)
-			rem	t2, tp, t1			# t0 = quociente, t2 = resto
-			addi 	t0, t0, 48			# converte para ascii
-			sb 	t0, 0(s0)			# coloca no buffer
-			addi 	t2, t2, 48			# converte para ascii
-			sb 	t2, 1(s0)			# coloca no buffer
-			sb 	zero, 2(s0)			# insere \NULL da string
-			la 	a0, TempBuffer			# endereco do Buffer										
-	  		j 	fimprintFloat			# imprime a string
+		  	# Imprimeo expoente com 2 digitos (máximo E+38)
+			li 	t1, 10    # Carrega 10.
+			fcvt.w.s  tp, ft3    # Passa ft3 para t0.
+			div 	t0, tp, t1    # Divide por 10 (dezena)
+			rem	t2, tp, t1    # T0 = quociente, t2 = resto.
+			addi 	t0, t0, 48    # Converte para ascii.
+			sb 	t0, 0(s0)    # Coloca no buffer.
+			addi 	t2, t2, 48    # Converte para ascii.
+			sb 	t2, 1(s0)    # Coloca no buffer.
+			sb 	zero, 2(s0)    # Insere \NULL da string.
+			la 	a0, TempBuffer    # Endereço do Buffer.
+	  		j 	fimprintFloat    # Imprime a string.
 								
-ehExp0printFloat: 	beq 	t1, zero, eh0printFloat		# Verifica se eh zero
+ehExp0printFloat: 	beq 	t1, zero, eh0printFloat    # Verifica se é zero.
 		
-ehDesnormprintFloat: 	la 	a0, NumDesnormP			# string numero desnormalizado positivo
-			beq 	s1, zero, fimprintFloat		# o sinal eh 1? entao eh negativo
-		 	la 	a0, NumDesnormN			# string numero desnormalizado negativo
-			j 	fimprintFloat			# imprime a string
+ehDesnormprintFloat: 	la 	a0, NumDesnormP    # String número desnormalizado positivo.
+			beq 	s1, zero, fimprintFloat    # O sinal é 1? entao é negativo.
+		 	la 	a0, NumDesnormN    # String número desnormalizado negativo.
+			j 	fimprintFloat    # Imprime a string.
 
-eh0printFloat:		la 	a0, NumZero			# string do zero
-			j 	fimprintFloat 	 		# imprime a string
+eh0printFloat:		la 	a0, NumZero    # String do zero.
+			j 	fimprintFloat    # Imprime a string.
 		 		 		 		 
-ehExp255printFloat: 	beq 	t1, zero, ehInfprintFloat	# se mantissa eh zero entao eh Infinito
+ehExp255printFloat: 	beq 	t1, zero, ehInfprintFloat    # Se mantissa é zero entao é Infinito.
 
-ehNaNprintfFloat:	la 	a0, NumNaN			# string do NaN
-			j 	fimprintFloat			# imprime string
+ehNaNprintfFloat:	la 	a0, NumNaN    # String do NaN.
+			j 	fimprintFloat    # Imprime string.
 
-ehInfprintFloat:	la 	a0, NumInfP			# string do infinito positivo
-			beq 	s1, zero, fimprintFloat		# o sinal eh 1? entao eh negativo
-			la 	a0, NumInfN			# string do infinito negativo
-								# imprime string
+ehInfprintFloat:	la 	a0, NumInfP    # String do infinito positivo.
+			beq 	s1, zero, fimprintFloat    # O sinal é 1? entao é negativo.
+			la 	a0, NumInfN    # String do infinito negativo.
+								# Imprime string
 		
-fimprintFloat:		jal 	printString			# imprime a string em a0
-			lw 	ra, 0(sp)			# recupera ra
-			addi 	sp, sp, 4			# libera espaco
-			ret					# retorna
+fimprintFloat:		jal 	printString    # Imprime a string em a0.
+			lw 	ra, 0(sp)    # Recupera ra antes de voltar ao chamador.
+			addi 	sp, sp, 4    # Libera o espaço reservado na pilha.
+			ret    # Retorna.
 
-#################################
-# printDouble                   #
-# imprime Double em fa0         #
-# na posicao (a1,a2)	cor a3  #
-#################################
+# -----------------------------------------------------------------------------
+# printDouble
+# imprime Double em fa0
+# na posição (a1,a2)	cor a3
+# -----------------------------------------------------------------------------
 # muda s0, s1
 
 printDouble: 
@@ -1322,11 +1322,11 @@ fimprintDouble:
 			ret
 
 
-#################################
-# readDouble      	 	#
-# fa0 = Double digitado        	#
-# 2017/2			#
-#################################
+# -----------------------------------------------------------------------------
+# readDouble
+# fa0 = Double digitado
+# 2017/2
+# -----------------------------------------------------------------------------
 
 readDouble: 
 
@@ -1342,284 +1342,284 @@ fimreadDouble:
 
 
 
-#################################
-# readFloat       	 	#
-# fa0 = float digitado        	#
-# 2017/2			#
-#################################
+# -----------------------------------------------------------------------------
+# readFloat
+# fa0 = float digitado
+# 2017/2
+# -----------------------------------------------------------------------------
 
-readFloat: addi sp, sp, -4			# aloca espaco
-	sw 	ra, 0(sp)			# salva ra
-	la 	a0, TempBuffer			# endereco do FloatBuffer
-	li 	a1, 32				# numero maximo de caracteres
-	jal	readString			# le string, retorna a2 ultimo endereco e a3 numero de caracteres
-	mv 	s0, a2				# ultimo endereco da string (antes do \0)
-	mv 	s1, a3				# numero de caracteres digitados
-	la	s7, TempBuffer			# Endereco do primeiro caractere
+readFloat: addi sp, sp, -4    # Reserva espaço na pilha.
+	sw 	ra, 0(sp)    # Preserva ra, que contém o endereço de retorno.
+	la 	a0, TempBuffer    # Endereço do FloatBuffer.
+	li 	a1, 32    # Número máximo de caracteres.
+	jal	readString    # Lê string, retorna a2 último endereço e a3 número de caracteres.
+	mv 	s0, a2    # Último endereço da string (antes do \0)
+	mv 	s1, a3    # Número de caracteres digitados.
+	la	s7, TempBuffer    # Endereço do primeiro caractere.
 	
-lePrimeiroreadFloat:	mv 	t0, s7		# Endereco de Inicio
-	lb 	t1, 0(t0)				# le primeiro caractere
-	li	tp, 'e'					# TP = 101 = 'e'
-	beq 	t1, tp, insere0AreadFloat		# insere '0' antes
-	li 	tp, 'E'					# TP = 69 = 'E'
-	beq 	t1, tp, insere0AreadFloat		# insere '0' antes
-	li	tp, '.'					# TP = 46 = '.'
-	beq 	t1, tp, insere0AreadFloat		#  insere '0' antes
-	li	tp, '+'					# TP = 43 = '+'
-	beq 	t1, tp, pulaPrimreadChar		# pula o primeiro caractere
-	li	tp, '-'					# TP = 45 = '-'
+lePrimeiroreadFloat:	mv 	t0, s7    # Endereço de início.
+	lb 	t1, 0(t0)    # Lê primeiro caractere.
+	li	tp, 'e'    # TP = 101 = 'e'.
+	beq 	t1, tp, insere0AreadFloat    # Insere '0' antes.
+	li 	tp, 'E'    # TP = 69 = 'E'.
+	beq 	t1, tp, insere0AreadFloat    # Insere '0' antes.
+	li	tp, '.'    # TP = 46 = '.'.
+	beq 	t1, tp, insere0AreadFloat    # Insere '0' antes.
+	li	tp, '+'    # TP = 43 = '+'.
+	beq 	t1, tp, pulaPrimreadChar    # Pula o primeiro caractere.
+	li	tp, '-'    # TP = 45 = '-'.
 	beq 	t1, tp, pulaPrimreadChar
 	j leUltimoreadFloat
 
-pulaPrimreadChar: addi s7,s7,1			# incrementa o endereco inicial
-		  j lePrimeiroreadFloat		# volta a testar o novo primeiro caractere
+pulaPrimreadChar: addi s7,s7,1    # Incrementa o endereço inicial.
+		  j lePrimeiroreadFloat    # Volta a testar o novo primeiro caractere.
 		  
-insere0AreadFloat: mv t0, s0			# endereco do ultimo caractere
-		   addi s0, s0, 1		# desloca o ultimo endereco para o proximo
-	   	   addi s1, s1, 1		# incrementa o num. caracteres
-	   	   sb 	zero, 1(s0)		# \NULL do final de string
-	   	   mv t5, s7			# primeiro caractere
-insere0Aloop:	   beq 	t0, t5, saiinsere0AreadFloat	# chegou no inicio entao fim
-		   lb 	t1, 0(t0)		# le caractere
-		   sb 	t1, 1(t0)		# escreve no proximo
-		   addi t0, t0, -1		# decrementa endereco
-		   j insere0Aloop		# volta ao loop
-saiinsere0AreadFloat: li t1, '0'		# ascii '0'
-		   sb t1, 0(t0)			# escreve '0' no primeiro caractere
+insere0AreadFloat: mv t0, s0    # Endereço do último caractere.
+		   addi s0, s0, 1    # Desloca o último endereço para o próximo.
+	   	   addi s1, s1, 1    # Incrementa o num. caracteres.
+	   	   sb 	zero, 1(s0)    # \NULL do final de string.
+	   	   mv t5, s7    # Primeiro caractere.
+insere0Aloop:	   beq 	t0, t5, saiinsere0AreadFloat    # Chegou no início entao fim.
+		   lb 	t1, 0(t0)    # Lê caractere.
+		   sb 	t1, 1(t0)    # Escreve no próximo.
+		   addi t0, t0, -1    # Decrementa endereço.
+		   j insere0Aloop    # Volta ao loop.
+saiinsere0AreadFloat: li t1, '0'    # Ascii '0'.
+		   sb t1, 0(t0)    # Escreve '0' no primeiro caractere.
 
-leUltimoreadFloat: lb  	t1, 0(s0)			# le ultimo caractere
-		li	tp, 'e'				# TP = 101 = 'e'
-		beq 	t1, tp, insere0PreadFloat	# insere '0' depois
-		li 	tp, 'E'				# TP = 69 = 'E'
-		beq 	t1, tp, insere0PreadFloat	# insere '0' depois
-		li	tp, '.'				# TP = 46 = '.'
-		beq 	t1, tp, insere0PreadFloat	# insere '0' depois
+leUltimoreadFloat: lb  	t1, 0(s0)    # Lê último caractere.
+		li	tp, 'e'    # TP = 101 = 'e'.
+		beq 	t1, tp, insere0PreadFloat    # Insere '0' depois.
+		li 	tp, 'E'    # TP = 69 = 'E'.
+		beq 	t1, tp, insere0PreadFloat    # Insere '0' depois.
+		li	tp, '.'    # TP = 46 = '.'.
+		beq 	t1, tp, insere0PreadFloat    # Insere '0' depois.
 		j 	inicioreadFloat
 	
-insere0PreadFloat: addi	s0, s0, 1		# desloca o ultimo endereco para o proximo
-	   	   addi	s1, s1, 1		# incrementa o num. caracteres
-		   li 	t1,'0'			# ascii '0'
-		   sb 	t1,0(s0)		# escreve '0' no ultimo
-		   sb 	zero,1(s0)		# \null do final de string
+insere0PreadFloat: addi	s0, s0, 1    # Desloca o último endereço para o próximo.
+	   	   addi	s1, s1, 1    # Incrementa o num. caracteres.
+		   li 	t1,'0'    # Ascii '0'.
+		   sb 	t1,0(s0)    # Escreve '0' no último.
+		   sb 	zero,1(s0)    # \null do final de string.
 
-inicioreadFloat:  fcvt.s.w 	fa0, zero	# fa0 Resultado inicialmente zero
-		li 	t0, 10			# inteiro 10	
-		fcvt.s.w 	ft6, t0		# ft6 contem sempre o numero cte 10.0000
-		li 	t0, 1			# inteiro 1
-		fcvt.s.w 	ft1, t0		# ft1 contem sempre o numero cte 1.0000	
+inicioreadFloat:  fcvt.s.w 	fa0, zero    # Fa0 Resultado inicialmente zero.
+		li 	t0, 10    # Inteiro 10.
+		fcvt.s.w 	ft6, t0    # Ft6 contem sempre o número cte 10.0000.
+		li 	t0, 1    # Inteiro 1.
+		fcvt.s.w 	ft1, t0    # Ft1 contem sempre o número cte 1.0000.
 	
-##### Verifica se tem 'e' ou 'E' na string  resultado em s3			
-procuraEreadFloat:	addi 	s3, s0, 1			# inicialmente nao tem 'e' ou 'E' na string (fora da string)
-			mv 	t0, s7				# endereco inicial
-loopEreadFloat: 	beq 	t0, s0, naotemEreadFloat	# sai se nao encontrou 'e'
-			lb 	t1, 0(t0)			# le o caractere
-			li	tp, 'e'				# TP = 101 = 'e'
-			beq 	t1, tp, ehEreadFloat		# tem 'e'
-			li 	tp, 'E'				# TP = 69 = 'E'
-			beq	t1, tp, ehEreadFloat		# tem 'E'
-			addi 	t0, t0, 1			# incrementa endereco
-			j 	loopEreadFloat			# volta ao loop
-ehEreadFloat: 		mv 	s3, t0				# endereco do 'e' ou 'E' na string
-naotemEreadFloat:						# nao tem 'e' ou 'E' s3 eh o endereco do \0 da string
+# Verifica se tem 'e' ou 'E' na string  resultado em s3
+procuraEreadFloat:	addi 	s3, s0, 1    # Inicialmente não tem 'e' ou 'E' na string (fora da string)
+			mv 	t0, s7    # Endereço inicial.
+loopEreadFloat: 	beq 	t0, s0, naotemEreadFloat    # Sai se não encontrou 'e'.
+			lb 	t1, 0(t0)    # Lê o caractere.
+			li	tp, 'e'    # TP = 101 = 'e'.
+			beq 	t1, tp, ehEreadFloat    # Tem 'e'.
+			li 	tp, 'E'    # TP = 69 = 'E'.
+			beq	t1, tp, ehEreadFloat    # Tem 'E'.
+			addi 	t0, t0, 1    # Incrementa endereço.
+			j 	loopEreadFloat    # Volta ao loop.
+ehEreadFloat: 		mv 	s3, t0    # Endereço do 'e' ou 'E' na string.
+naotemEreadFloat:    # Não tem 'e' ou 'E' s3 é o endereço do \0 da string.
 
-##### Verifica se tem '.' na string resultado em s2 espera-se que nao exista ponto no expoente
-procuraPontoreadFloat:	mv 	s2, s3				# local inicial do ponto na string (='e' se existir) ou fora da string	
-			mv 	t0, s7				# endereco inicial
-loopPontoreadFloat: 	beq 	t0, s0, naotemPontoreadFloat	# sai se nao encontrou '.'
-			lb 	t1, 0(t0)			# le o caractere
-			li	tp, '.'				# TP = 46 = '.'
-			beq 	t1, tp, ehPontoreadFloat	# tem '.'
-			addi 	t0, t0, 1			# incrementa endereco
-			j 	loopPontoreadFloat		# volta ao loop
-ehPontoreadFloat: 	mv 	s2, t0				# endereco do '.' na string
-naotemPontoreadFloat:						# nao tem '.' s2 = local do 'e' ou \0 da string
+# Verifica se tem '.' na string resultado em s2 espera-se que não exista ponto no expoente
+procuraPontoreadFloat:	mv 	s2, s3    # Local inicial do ponto na string (='e' se existir) ou fora da string.
+			mv 	t0, s7    # Endereço inicial.
+loopPontoreadFloat: 	beq 	t0, s0, naotemPontoreadFloat    # Sai se não encontrou '.'.
+			lb 	t1, 0(t0)    # Lê o caractere.
+			li	tp, '.'    # TP = 46 = '.'.
+			beq 	t1, tp, ehPontoreadFloat    # Tem '.'.
+			addi 	t0, t0, 1    # Incrementa endereço.
+			j 	loopPontoreadFloat    # Volta ao loop.
+ehPontoreadFloat: 	mv 	s2, t0    # Endereço do '.' na string.
+naotemPontoreadFloat:    # Não tem '.' s2 = local do 'e' ou \0 da string.
 
-### Encontra a parte inteira em fa0
-intreadFloat:		fcvt.s.w 	ft2, zero		# zera parte inteira
-			addi 	t0, s2, -1			# endereco do caractere antes do ponto
-			fmv.s 	ft3, ft1			# ft3 contem unidade/dezenas/centenas		
-			mv 	t5, s7				# Primeiro Endereco
-loopintreadFloat: 	blt 	t0, t5, fimintreadFloat		# sai se o endereco for < inicio da string
-			lb 	t1, 0(t0)			# le o caracter
-			li	tp, '0'				# TP = 48 = '0'
-			blt 	t1, tp, erroreadFloat		# nao eh caractere valido para numero
-			li	tp, '9'				# TP = 57 = '9'
-			bgt 	t1, tp, erroreadFloat		# nao eh caractere valido para numero
-			addi 	t1, t1, -48			# converte ascii para decimal
-			fcvt.s.w  ft2, t1			# digito lido em float
+# Encontra a parte inteira em fa0
+intreadFloat:		fcvt.s.w 	ft2, zero    # Zera parte inteira.
+			addi 	t0, s2, -1    # Endereço do caractere antes do ponto.
+			fmv.s 	ft3, ft1    # Ft3 contem unidade/dezenas/centenas.
+			mv 	t5, s7    # Primeiro endereço.
+loopintreadFloat: 	blt 	t0, t5, fimintreadFloat    # Sai se o endereço for < início da string.
+			lb 	t1, 0(t0)    # Lê o caracter.
+			li	tp, '0'    # TP = 48 = '0'.
+			blt 	t1, tp, erroreadFloat    # Não é caractere valido para número.
+			li	tp, '9'    # TP = 57 = '9'.
+			bgt 	t1, tp, erroreadFloat    # Não é caractere valido para número.
+			addi 	t1, t1, -48    # Converte ascii para decimal.
+			fcvt.s.w  ft2, t1    # Digito lido em float.
 
-			fmul.s 	ft2,ft2,ft3			# multiplica por un/dezena/centena
-			fadd.s 	fa0,fa0,ft2			# soma no resultado
-			fmul.s 	ft3,ft3,ft6			# proxima dezena/centena
+			fmul.s 	ft2,ft2,ft3    # Multiplica por un/dezena/centena.
+			fadd.s 	fa0,fa0,ft2    # Soma no resultado.
+			fmul.s 	ft3,ft3,ft6    # Proxima dezena/centena.
 
-			addi 	t0,t0,-1			# endereco anterior
-			j 	loopintreadFloat		# volta ao loop
+			addi 	t0,t0,-1    # Endereço anterior.
+			j 	loopintreadFloat    # Volta ao loop.
 fimintreadFloat:
 
-### Encontra a parte fracionaria  ja em fa0							
-fracreadFloat:		fcvt.s.w 	ft2, zero		# zera parte fracionaria
-			addi 	t0, s2, 1			# endereco depois do ponto
-			fdiv.s 	ft3, ft1, ft6			# ft3 inicial 0.1
+# Encontra a parte fracionaria  já em fa0
+fracreadFloat:		fcvt.s.w 	ft2, zero    # Zera parte fracionaria.
+			addi 	t0, s2, 1    # Endereço depois do ponto.
+			fdiv.s 	ft3, ft1, ft6    # Ft3 inicial 0.1.
 	
-loopfracreadFloat: 	bge 	t0, s3, fimfracreadFloat	# endereco eh 'e' 'E' ou >ultimo
-			lb 	t1, 0(t0)			# le o caracter
-			li	tp, '0'				# TP = 48 = '0'
-			blt 	t1, tp, erroreadFloat		# nao eh valido
-			li	tp, '9'				# TP = 57 = '9'
-			bgt 	t1, tp, erroreadFloat		# nao eh valido
-			addi 	t1, t1, -48			# converte ascii para decimal
-			fcvt.s.w 	ft2, t1			# digito lido em float		
+loopfracreadFloat: 	bge 	t0, s3, fimfracreadFloat    # Endereço é 'e' 'E' ou >último.
+			lb 	t1, 0(t0)    # Lê o caracter.
+			li	tp, '0'    # TP = 48 = '0'.
+			blt 	t1, tp, erroreadFloat    # Não é valido.
+			li	tp, '9'    # TP = 57 = '9'.
+			bgt 	t1, tp, erroreadFloat    # Não é valido.
+			addi 	t1, t1, -48    # Converte ascii para decimal.
+			fcvt.s.w 	ft2, t1    # Digito lido em float.
 
-			fmul.s 	ft2, ft2, ft3			# multiplica por ezena/centena
-			fadd.s 	fa0, fa0, ft2			# soma no resultado
-			fdiv.s 	ft3, ft3, ft6			# proxima frac un/dezena/centena
+			fmul.s 	ft2, ft2, ft3    # Multiplica por ezena/centena.
+			fadd.s 	fa0, fa0, ft2    # Soma no resultado.
+			fdiv.s 	ft3, ft3, ft6    # Proxima frac un/dezena/centena.
 	
-			addi 	t0, t0, 1			# proximo endereco
-			j 	loopfracreadFloat		# volta ao loop		
+			addi 	t0, t0, 1    # Próximo endereço.
+			j 	loopfracreadFloat    # Volta ao loop.
 fimfracreadFloat:
 
-### Encontra a potencia em ft2
+# Encontra a potencia em ft2
 
-potreadFloat:		fcvt.s.w 	ft2, zero		# zera potencia
-			addi 	t0, s3, 1			# endereco seguinte ao 'e'
-			li 	s4, 0				# sinal do expoente positivo
-			lb 	t1, 0(t0)			# le o caractere seguinte ao 'e'
-			li	tp, '-'				# TP = 45 = '-'
-			beq	t1, tp, potsinalnegreadFloat	# sinal do expoente esta escrito e eh positivo
-			li	tp, '+'				# TP = 43 = '+'
-			beq 	t1, tp, potsinalposreadFloat	# sinal do expoente eh negativo
-			j 	pulapotsinalreadFloat		# nao esta escrito o sinal do expoente
-potsinalnegreadFloat:	li 	s4, 1				# s4=1 expoente negativo
-potsinalposreadFloat:	addi 	t0, t0, 1			# se tiver '-' ou '+' avanca para o proximo endereco
-pulapotsinalreadFloat:	mv 	s5, t0 				# Neste ponto s5 contem o endereco do primeiro digito da pot e s4 o sinal do expoente		
+potreadFloat:		fcvt.s.w 	ft2, zero    # Zera potencia.
+			addi 	t0, s3, 1    # Endereço seguinte ao 'e'.
+			li 	s4, 0    # Sinal do expoente positivo.
+			lb 	t1, 0(t0)    # Lê o caractere seguinte ao 'e'.
+			li	tp, '-'    # TP = 45 = '-'.
+			beq	t1, tp, potsinalnegreadFloat    # Sinal do expoente esta escrito e é positivo.
+			li	tp, '+'    # TP = 43 = '+'.
+			beq 	t1, tp, potsinalposreadFloat    # Sinal do expoente é negativo.
+			j 	pulapotsinalreadFloat    # Não esta escrito o sinal do expoente.
+potsinalnegreadFloat:	li 	s4, 1    # S4=1 expoente negativo.
+potsinalposreadFloat:	addi 	t0, t0, 1    # Se tiver '-' ou '+' avanca para o próximo endereço.
+pulapotsinalreadFloat:	mv 	s5, t0    # Neste ponto s5 contem o endereço do primeiro digito da pot e s4 o sinal do expoente.
 
-			fmv.s 	ft3, ft1			# ft3 un/dez/cen = 1
+			fmv.s 	ft3, ft1    # Ft3 un/dez/cen = 1.
 	
-### Encontra o expoente inteiro em t2
-expreadFloat:		li 	t2, 0				# zera expoente
-			mv 	t0, s0				# endereco do ultimo caractere da string
-			li 	t3, 10				# numero dez
-			li 	t4, 1				# und/dez/cent
+# Encontra o expoente inteiro em t2
+expreadFloat:		li 	t2, 0    # Zera expoente.
+			mv 	t0, s0    # Endereço do último caractere da string.
+			li 	t3, 10    # Número dez.
+			li 	t4, 1    # Und/dez/cent.
 				
-loopexpreadFloat:	blt 	t0, s5, fimexpreadFloat		# ainda nao eh o endereco do primeiro digito?
-			lb 	t1, 0(t0)			# le o caracter
-			addi 	t1, t1, -48			# converte ascii para decimal
-			mul 	t1, t1, t4			# mul digito
-			add 	t2, t2, t1			# soma ao exp
-			mul 	t4, t4, t3			# proxima casa decimal
-			addi 	t0, t0, -1			# endereco anterior
-			j loopexpreadFloat			# volta ao loop
+loopexpreadFloat:	blt 	t0, s5, fimexpreadFloat    # Ainda não é o endereço do primeiro digito?
+			lb 	t1, 0(t0)    # Lê o caracter.
+			addi 	t1, t1, -48    # Converte ascii para decimal.
+			mul 	t1, t1, t4    # Mul digito.
+			add 	t2, t2, t1    # Soma ao exp.
+			mul 	t4, t4, t3    # Proxima casa decimal.
+			addi 	t0, t0, -1    # Endereço anterior.
+			j loopexpreadFloat    # Volta ao loop.
 fimexpreadFloat:
 																																																								
-# calcula o numero em ft2 o numero 10^exp
-			fmv.s 	ft2, ft1			# numero 10^exp  inicial=1
-			fmv.s 	ft3, ft6			# se o sinal for + ft3 eh 10
-			li	tp, 0x00000000			# TP = ZERO
-			beq 	s4, tp, sinalexpPosreadFloat	# se sinal exp positivo
-			fdiv.s 	ft3, ft1, ft6			# se o final for - ft3 eh 0.1
-sinalexpPosreadFloat:	li 	t0, 0				# contador 
-sinalexpreadFloat: 	beq 	t0, t2, fimsinalexpreadFloat	# se chegou ao fim
-			fmul.s 	ft2, ft2, ft3			# multiplica pelo fator 10 ou 0.1
-			addi 	t0, t0, 1			# incrementa o contador
+# Calcula o número em ft2 o número 10^exp
+			fmv.s 	ft2, ft1    # Número 10^exp  inicial=1.
+			fmv.s 	ft3, ft6    # Se o sinal for + ft3 é 10.
+			li	tp, 0x00000000    # TP = ZERO.
+			beq 	s4, tp, sinalexpPosreadFloat    # Se sinal exp positivo.
+			fdiv.s 	ft3, ft1, ft6    # Se o final for - ft3 é 0.1.
+sinalexpPosreadFloat:	li 	t0, 0    # Contador.
+sinalexpreadFloat: 	beq 	t0, t2, fimsinalexpreadFloat    # Se chegou ao fim.
+			fmul.s 	ft2, ft2, ft3    # Multiplica pelo fator 10 ou 0.1.
+			addi 	t0, t0, 1    # Incrementa o contador.
 			j 	sinalexpreadFloat
 fimsinalexpreadFloat:
 
-		fmul.s 	fa0, fa0, ft2		# multiplicacao final!
+		fmul.s 	fa0, fa0, ft2    # Multiplicação final!
 	
-		la 	t0, TempBuffer		# ajuste final do sinal do numero
-		lb 	t1, 0(t0)		# le primeiro caractere
-		li	tp, '-'			# TP = 45 = '-'
-		bne 	t1, tp, fimreadFloat	# nao eh '-' entao fim
-		fneg.s 	fa0, fa0		# nega o numero float
+		la 	t0, TempBuffer    # Ajuste final do sinal do número.
+		lb 	t1, 0(t0)    # Lê primeiro caractere.
+		li	tp, '-'    # TP = 45 = '-'.
+		bne 	t1, tp, fimreadFloat    # Não é '-' entao fim.
+		fneg.s 	fa0, fa0    # Nega o número float.
 
 erroreadFloat:		
-fimreadFloat: 	lw 	ra, 0(sp)		# recupera ra
-		addi 	sp, sp, 4		# libera espaco
-		ret				# retorna
+fimreadFloat: 	lw 	ra, 0(sp)    # Recupera ra antes de voltar ao chamador.
+		addi 	sp, sp, 4    # Libera o espaço reservado na pilha.
+		ret    # Retorna.
 
 
-############################################
-#  Time                            	   #
-#  a0    =    TimeLOW                 	   #
-#  a1    =    TimeHIGH	                   #
-############################################
+# -----------------------------------------------------------------------------
+# Time
+# a0    =    TimeLOW
+# a1    =    TimeHIGH
+# -----------------------------------------------------------------------------
 Time:  	DE1(s8,Time.DE1)
-	li 	a7, 30				# Chama o ecall do Rars
+	li 	a7, 30    # Chama o ecall do Rars.
 	ecall
-	ret					# saida
+	ret    # Saida.
 	
-Time.DE1:	csrr a0, time			#  Le time LOW
-		csrr a1, timeh 			#  Le time HIGH
+Time.DE1:	csrr a0, time    # Lê time LOW.
+		csrr a1, timeh    # Lê time HIGH.
 		ret
 
 
-############################################
-#  Sleep                            	   #
-#  a0    =    Tempo em ms             	   #
-############################################
+# -----------------------------------------------------------------------------
+# Sleep
+# a0    =    Tempo em ms
+# -----------------------------------------------------------------------------
 Sleep:  DE1(s8,Sleep.DE1)
-	li 	a7, 32				# Chama o ecall do Rars
+	li 	a7, 32    # Chama o ecall do Rars.
 	ecall
-	ret					#Saida
+	ret    # Saida.
 
-Sleep.DE1:	csrr 	t0, time		# Le o tempo do sistema
-		add 	t1, t0, a0		# soma com o tempo solicitado
-Sleep.Loop:	csrr	t0, time		# Le o tempo do sistema
-		bltu	t0, t1, Sleep.Loop	# t0<t1 ?
+Sleep.DE1:	csrr 	t0, time    # Lê o tempo do sistema.
+		add 	t1, t0, a0    # Soma com o tempo solicitado.
+Sleep.Loop:	csrr	t0, time    # Lê o tempo do sistema.
+		bltu	t0, t1, Sleep.Loop    # T0<t1 ?
 		ret
 
 
-############################################
-#  Random         41                       #
-#  a0    =    numero randomico        	   #
-############################################
+# -----------------------------------------------------------------------------
+# Random         41
+# a0    =    número randomico
+# -----------------------------------------------------------------------------
 
 Random:	 DE1(s8,Random.DE1)
-	li 	a7,41			# Chama o ecall do Rars
+	li 	a7,41    # Chama o ecall do Rars.
 	ecall	
-	ret				# saida
+	ret    # Saida.
 	
-Random.DE1: 	li 	t0, LFSR	# carrega endereco do LFSR
-		lw 	a0, 0(t0)	# le a word em a0
-		ret			# retorna
+Random.DE1: 	li 	t0, LFSR    # Carrega endereço do LFSR.
+		lw 	a0, 0(t0)    # Lê a word em a0.
+		ret    # Retorna.
 
 
-############################################
-#  Random 42                           	   #
-#  			                   #
-#  a1    =    Valor m�ximo                 #
-#  output a0 = numero randomico        	   #
-############################################
+# -----------------------------------------------------------------------------
+# Random 42
+# -----------------------------------------------------------------------------
+# a1    =    Valor máximo
+# output a0 = número randomico
+# -----------------------------------------------------------------------------
 
 Random2:	DE1(s8,Random2.DE1)
-		li 	a7,42			# Chama o ecall do Rars
+		li 	a7,42    # Chama o ecall do Rars.
 		ecall	
-		ret				# saida
+		ret    # Saida.
 	
-Random2.DE1: 	li 	t0, LFSR	# carrega endereco do LFSR
-		lw 	a0, 0(t0)	# le a word em a0
+Random2.DE1: 	li 	t0, LFSR    # Carrega endereço do LFSR.
+		lw 	a0, 0(t0)    # Lê a word em a0.
 		jal 	__umodsi3
-		#remu 	a0,a0,a1	# numero entre 0 e a1
-		ret			# retorna
+		# Remu 	a0,a0,a1	# número entre 0 e a1
+		ret    # Retorna.
 
 
 
-#################################
-#    CLS                        #
-#  Clear Screen                 #
-#  a0 = cor      		#
-#  a1 = frame                   #
-#################################
+# -----------------------------------------------------------------------------
+# CLS
+# Clear Screen
+# a0 = cor
+# a1 = frame
+# -----------------------------------------------------------------------------
 
 clsCLS:	beq 	a1, zero, CLS.frame0
-	li      t1, VGAADDRESSINI1              # Memoria VGA 1
+	li      t1, VGAADDRESSINI1    # Memória VGA 1.
    	li      t2, VGAADDRESSFIM1
    	j 	CLS.pula
-CLS.frame0: 	li      t1, VGAADDRESSINI0           # Memoria VGA 0
+CLS.frame0: 	li      t1, VGAADDRESSINI0    # Memória VGA 0.
    	    	li      t2, VGAADDRESSFIM0   	
 CLS.pula:	andi    a0, a0, 0x00FF
-#    	 li 	 t0, 0x01010101
-#    	 mul	 a0, t0, a0
+# Trecho desativado, mantido para consulta: li 	 t0, 0x01010101
+# mul	 a0, t0, a0
  		mv 	t0, a0
  		slli 	a0, a0, 8
  		or 	t0, t0, a0
@@ -1635,15 +1635,15 @@ CLS.for:	beq     t1, t2, CLS.fim
 CLS.fim:	ret
 
 
-#########################################################################
-#  Draw Line                  						#
-#  Desenha uma linha do ponto (a0,a1) ao ponto (a2,a3) com a cor a4     #
-# na Frame a5 (0 ou 1)							#
-#########################################################################
+# -----------------------------------------------------------------------------
+# Draw Line
+# Desenha uma linha do ponto (a0,a1) ao ponto (a2,a3) com a cor a4
+# na Frame a5 (0 ou 1)
+# -----------------------------------------------------------------------------
 
-BRESENHAM: 	li	a6, VGAADDRESSINI0           	# Memoria VGA 0
+BRESENHAM: 	li	a6, VGAADDRESSINI0    # Memória VGA 0.
 	   	beq	a5, zero, pulaBRES
-	   	li 	a6, VGAADDRESSINI1              # Memoria VGA 1
+	   	li 	a6, VGAADDRESSINI1    # Memória VGA 1.
 	   	
 pulaBRES: 	li 	a7, 320
 	  	sub 	t0, a3, a1
@@ -1671,121 +1671,121 @@ PULACBRES: 	ble  	a1, a3, PULAC2BRES
 	   	mv 	a3, a5
 PULAC2BRES:	j PLOTHIGHBRES
 
-PLOTLOWBRES:	sub 	t0, a2, a0		# dx=x1-x0
-	 	sub 	t1, a3, a1		# dy y1-y0
-	 	li  	t2, 1			# yi=1
-	 	bge 	t1, zero, PULA1BRES	# dy>=0 PULA
-	 	li  	t2, -1			# yi=-1
-	 	sub 	t1, zero, t1		# dy=-dy
-PULA1BRES:	slli 	t3, t1, 1		# 2*dy
-		sub 	t3, t3, t0		# D=2*dy-dx
-		mv 	t4, a1			# y=y0
-		mv 	t5, a0			# x=x0
+PLOTLOWBRES:	sub 	t0, a2, a0    # Dx=x1-x0.
+	 	sub 	t1, a3, a1    # Dy y1-y0.
+	 	li  	t2, 1    # Yi=1.
+	 	bge 	t1, zero, PULA1BRES    # Dy>=0 PULA.
+	 	li  	t2, -1    # Yi=-1.
+	 	sub 	t1, zero, t1    # Dy=-dy.
+PULA1BRES:	slli 	t3, t1, 1    # 2*dy.
+		sub 	t3, t3, t0    # D=2*dy-dx.
+		mv 	t4, a1    # Y=y0.
+		mv 	t5, a0    # X=x0.
 	
 LOOPx1BRES:	TEM_M(s8,BRESENHAM.mul1)
 		MULTIPLY(t6, t4, a7)
 		j BRESENHAM.mul1d
-BRESENHAM.mul1:	mul 	t6, t4, a7		# y*320
-BRESENHAM.mul1d:add 	t6, t6, t5		# y*320+x
-		add 	t6, t6, a6		# 0xFF000000+y*320+x
-		sb 	a4, 0(t6)		# plot com cor a4
+BRESENHAM.mul1:	mul 	t6, t4, a7    # Y*320.
+BRESENHAM.mul1d:add 	t6, t6, t5    # Y*320+x.
+		add 	t6, t6, a6    # 0xFF000000+y*320+x.
+		sb 	a4, 0(t6)    # Plot com cor a4.
 	
-		ble 	t3, zero, PULA2BRES	# D<=0
-		add 	t4, t4, t2		# y=y+yi
-		slli 	t6, t0, 1		# 2*dx
-		sub 	t3, t3, t6		# D=D-2dx
-PULA2BRES:	slli 	t6, t1, 1		# 2*dy
-		add 	t3, t3, t6		# D=D+2dx
+		ble 	t3, zero, PULA2BRES    # D<=0.
+		add 	t4, t4, t2    # Y=y+yi.
+		slli 	t6, t0, 1    # 2*dx.
+		sub 	t3, t3, t6    # D=D-2dx.
+PULA2BRES:	slli 	t6, t1, 1    # 2*dy.
+		add 	t3, t3, t6    # D=D+2dx.
 		addi	t5, t5, 1
 		bne 	t5, a2, LOOPx1BRES
 		ret
 		
-PLOTHIGHBRES: 	sub 	t0, a2, a0		# dx=x1-x0
-	 	sub 	t1, a3, a1		# dy y1-y0
-	 	li 	t2, 1			# xi=1
-	 	bge 	t0, zero, PULA3BRES	# dy>=0 PULA
-	 	li 	t2, -1			# xi=-1
-	 	sub 	t0, zero, t0		# dx=-dx
-PULA3BRES:	slli 	t3, t0, 1		# 2*dx
-		sub 	t3, t3, t1		# D=2*dx-d1
-		mv 	t4, a0			# x=x0
-		mv 	t5, a1			# y=y0
+PLOTHIGHBRES: 	sub 	t0, a2, a0    # Dx=x1-x0.
+	 	sub 	t1, a3, a1    # Dy y1-y0.
+	 	li 	t2, 1    # Xi=1.
+	 	bge 	t0, zero, PULA3BRES    # Dy>=0 PULA.
+	 	li 	t2, -1    # Xi=-1.
+	 	sub 	t0, zero, t0    # Dx=-dx.
+PULA3BRES:	slli 	t3, t0, 1    # 2*dx.
+		sub 	t3, t3, t1    # D=2*dx-d1.
+		mv 	t4, a0    # X=x0.
+		mv 	t5, a1    # Y=y0.
 	
 LOOPx2BRES:	TEM_M(s8,BRESENHAM.mul2)
 		MULTIPLY(t6, t5, a7)
 		j BRESENHAM.mul2d
-BRESENHAM.mul2:	mul 	t6, t5, a7		# y*320
-BRESENHAM.mul2d:add 	t6, t6, t4		# y*320+x
-		add 	t6, t6, a6		# 0xFF000000+y*320+x
-		sb 	a4, 0(t6)		# plot com cor a4
+BRESENHAM.mul2:	mul 	t6, t5, a7    # Y*320.
+BRESENHAM.mul2d:add 	t6, t6, t4    # Y*320+x.
+		add 	t6, t6, a6    # 0xFF000000+y*320+x.
+		sb 	a4, 0(t6)    # Plot com cor a4.
 	
-		ble 	t3, zero, PULA4BRES	# D<=0
-		add 	t4, t4, t2		# x=x+xi
-		slli 	t6, t1, 1		# 2*dy
-		sub 	t3, t3, t6		# D=D-2dy
-PULA4BRES: 	slli 	t6, t0, 1		# 2*dy
-		add 	t3, t3, t6		# D=D+2dx
+		ble 	t3, zero, PULA4BRES    # D<=0.
+		add 	t4, t4, t2    # X=x+xi.
+		slli 	t6, t1, 1    # 2*dy.
+		sub 	t3, t3, t6    # D=D-2dy.
+PULA4BRES: 	slli 	t6, t0, 1    # 2*dy.
+		add 	t3, t3, t6    # D=D+2dx.
 		addi 	t5, t5, 1
 		bne 	t5, a3, LOOPx2BRES
 		ret		
 
 
-# Sugestao para nomes de loops: Sempre comecar com o nome da sub-rotina, ent�o adicionar um '.', seguido do nome do loop . Garante que o nome do loop ser� �nico, se as sub-rotinas
+# Sugestao para nomes de loops: Sempre comecar com o nome da sub-rotina, então adicionar um '.', seguido do nome do loop . Garante que o nome do loop será único, se as sub-rotinas
 # tiverem nomes diferentes.
 
-#############################################
-#  PrintIntUnsigned                         #
-#  a0    =    valor inteiro                 #
-#  a1    =    x                             #
-#  a2    =    y  			    #
-#  a3    =    cor                           #
-#  a4    =    frame			    #
-#############################################
+# -----------------------------------------------------------------------------
+# PrintIntUnsigned
+# a0    =    valor inteiro
+# a1    =    x
+# a2    =    y
+# a3    =    cor
+# a4    =    frame
+# -----------------------------------------------------------------------------
 
-printIntUnsigned:	addi 	sp, sp, -4		# Aloca espaco
-		sw 	ra, 0(sp)			# salva ra
-		la 	t0, TempBuffer			# carrega o Endereco do Buffer da String
+printIntUnsigned:	addi 	sp, sp, -4    # Reserva espaço na pilha.
+		sw 	ra, 0(sp)    # Preserva ra, que contém o endereço de retorno.
+		la 	t0, TempBuffer    # Carrega o endereço do Buffer da String.
 		
-		li 	t2, 10				# carrega numero 10
-		li 	t1, 0				# carrega numero de digitos com 0
+		li 	t2, 10    # Carrega número 10.
+		li 	t1, 0    # Carrega número de digitos com 0.
 
 printIntUnsigned.loop1:	TEM_M(s8,printIntUnsigned.pula1)
 			DIVU10(t4,a0)
 			REMU10(t3,a0)
 			j	printIntUnsigned.pula1d
-printIntUnsigned.pula1:	divu 	t4, a0, t2			# divide por 10 (quociente)
-			remu 	t3, a0, t2			# resto
-printIntUnsigned.pula1d:addi 	sp, sp, -4			# aloca espaco na pilha
-		sw 	t3, 0(sp)			# coloca resto na pilha
-		mv 	a0, t4				# atualiza o numero com o quociente
-		addi 	t1, t1, 1			# incrementa o contador de digitos
-		bne 	a0, zero, printIntUnsigned.loop1# verifica se o numero eh zero
+printIntUnsigned.pula1:	divu 	t4, a0, t2    # Divide por 10 (quociente)
+			remu 	t3, a0, t2    # Resto.
+printIntUnsigned.pula1d:addi 	sp, sp, -4    # Reserva espaço na pilha na pilha.
+		sw 	t3, 0(sp)    # Coloca resto na pilha.
+		mv 	a0, t4    # Atualiza o número com o quociente.
+		addi 	t1, t1, 1    # Incrementa o contador de digitos.
+		bne 	a0, zero, printIntUnsigned.loop1    # Verifica se o número é zero.
 				
-printIntUnsigned.loop2:	lw 	t2, 0(sp)		# le digito da pilha
-		addi 	sp, sp, 4			# libera espaco
-		addi 	t2, t2, 48			# converte o digito para ascii
-		sb 	t2, 0(t0)			# coloca caractere no buffer
-		addi 	t0, t0, 1			# incrementa endereco do buffer
-		addi 	t1, t1, -1			# decrementa contador de digitos
-		bne 	t1, zero, printIntUnsigned.loop2# eh o ultimo?
-		sb 	zero, 0(t0)			# insere \NULL na string
+printIntUnsigned.loop2:	lw 	t2, 0(sp)    # Lê digito da pilha.
+		addi 	sp, sp, 4    # Libera o espaço reservado na pilha.
+		addi 	t2, t2, 48    # Converte o digito para ascii.
+		sb 	t2, 0(t0)    # Coloca caractere no buffer.
+		addi 	t0, t0, 1    # Incrementa endereço do buffer.
+		addi 	t1, t1, -1    # Decrementa contador de digitos.
+		bne 	t1, zero, printIntUnsigned.loop2    # É o último?
+		sb 	zero, 0(t0)    # Insere \NULL na string.
 		
-		la 	a0, TempBuffer			# Endereco do buffer da srting
-		jal 	printString			# chama o print string
+		la 	a0, TempBuffer    # Endereço do buffer da srting.
+		jal 	printString    # Chama o print string.
 				
-		lw 	ra, 0(sp)			# recupera a
-		addi 	sp, sp, 4			# libera espaco
+		lw 	ra, 0(sp)    # Recupera a.
+		addi 	sp, sp, 4    # Libera o espaço reservado na pilha.
 printIntUnsigned.fim:	ret
 
 
 
 
-###########################################################################
-# lib de opera��es multiplica��o, divis�o e resto para a ISA RV32I
+# -----------------------------------------------------------------------------
+# lib de operações multiplicação, divisão e resto para a ISA RV32I
 # Nomenclatura usada pelo gcc
-###########################################################################
+# -----------------------------------------------------------------------------
 
-# Multiplica��o signed em a0 e a1  retorno em a0
+# Multiplicação signed em a0 e a1  retorno em a0
 # https://github.com/gcc-mirror/gcc/tree/master/libgcc/config/epiphany
 __mulsi3:	addi 	sp,sp,-12
 		sw 	a1,0(sp)
@@ -1808,7 +1808,7 @@ mulsi3.L1: 	lw 	a1,0(sp)
 		addi 	sp,sp,12
 		ret
         
-# Divis�o unsigned em a0 e a1 retorno em a0
+# Divisão unsigned em a0 e a1 retorno em a0
 # https://stackoverflow.com/questions/34457575/integer-division-algorithm-analysis
 __udivsi3:	addi 	sp,sp,-16
 		sw 	a1,0(sp)
@@ -1844,34 +1844,34 @@ __umodsi3:	addi	sp, sp, -12
 		sw 	t0, 0(sp)
 		sw 	t1, 4(sp)
 		sw 	ra, 8(sp)
-	 	mv 	t0, a0		# dividendo
-		mv 	t1, a1		# divisor
+	 	mv 	t0, a0    # Dividendo.
+		mv 	t1, a1    # Divisor.
 		jal 	__udivsi3
-		mv 	a1, t1		# quociente * divisor
+		mv 	a1, t1    # Quociente * divisor.
 		jal 	__mulsi3
-		sub 	a0, t0, a0	# dividendo-quociente*divisor
+		sub 	a0, t0, a0    # Dividendo-quociente*divisor.
 		lw 	t0, 0(sp)
 		lw 	t1, 4(sp)
 		lw 	ra, 8(sp)
 		addi 	sp, sp, 12
 		ret
 		
-# Divis�o signed em a0 e a1	
+# Divisão signed em a0 e a1
 __divsi3:	addi	sp, sp, -16
 		sw 	t0, 0(sp)
 		sw 	t1, 4(sp)
 		sw 	t2, 8(sp)
 		sw 	ra, 12(sp)
-		srai	t0,a0,31	# indica se a0 � pos(0) ou neg (2^32-1)
-		srai 	t1,a1,31	# indica se a1 � pos(0) ou neg (2^32-1)
-		xor	t2,t0,t1	# indica se deve(!=0) ou n�o(==0) inverter o sinal do resultado
+		srai	t0,a0,31    # Indica se a0 é pos(0) ou neg (2^32-1)
+		srai 	t1,a1,31    # Indica se a1 é pos(0) ou neg (2^32-1)
+		xor	t2,t0,t1    # Indica se deve(!=0) ou não(==0) inverter o sinal do resultado.
 		beqz 	t0,divsi3.pula1
-		neg	a0,a0		# nega
+		neg	a0,a0    # Nega.
 divsi3.pula1:	beqz 	t1,divsi3.pula2
-		neg	a1,a1		# nega
-divsi3.pula2:	jal 	__udivsi3	# divis�o unsigned
+		neg	a1,a1    # Nega.
+divsi3.pula2:	jal 	__udivsi3    # Divisão unsigned.
 		beqz	t2, divsi3.pula3	
-		neg	a0,a0		# nega
+		neg	a0,a0    # Nega.
 divsi3.pula3:	lw 	t0, 0(sp)
 		lw 	t1, 4(sp)
 		lw 	t2, 8(sp)
@@ -1879,20 +1879,20 @@ divsi3.pula3:	lw 	t0, 0(sp)
 		addi 	sp, sp, 16
 		ret
 						
-# Resto signed em a0 e a1	
+# Resto signed em a0 e a1
 __modsi3:	addi	sp, sp, -12
 		sw 	t0, 0(sp)
 		sw 	t1, 4(sp)
 		sw 	ra, 8(sp)
-		srai	t0,a0,31	# indica se a0 � pos(0) ou neg (2^32-1)
-		srai 	t1,a1,31	# indica se a1 � pos(0) ou neg (2^32-1)
+		srai	t0,a0,31    # Indica se a0 é pos(0) ou neg (2^32-1)
+		srai 	t1,a1,31    # Indica se a1 é pos(0) ou neg (2^32-1)
 		beqz 	t0,modsi3.pula1
-		neg	a0,a0		# nega
+		neg	a0,a0    # Nega.
 modsi3.pula1:	beqz 	t1,modsi3.pula2
-		neg	a1,a1		# nega
-modsi3.pula2:	jal 	__umodsi3	# resto unsigned
-		beqz	t0, modsi3.pula3	# sinal do dividendo	
-		neg	a0,a0		# nega
+		neg	a1,a1    # Nega.
+modsi3.pula2:	jal 	__umodsi3    # Resto unsigned.
+		beqz	t0, modsi3.pula3    # Sinal do dividendo.
+		neg	a0,a0    # Nega.
 modsi3.pula3:	lw 	t0, 0(sp)
 		lw 	t1, 4(sp)
 		lw 	ra, 8(sp)

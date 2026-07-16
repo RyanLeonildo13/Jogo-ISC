@@ -1,16 +1,18 @@
+# Convenção deste módulo: a0-a3 descrevem o primeiro retângulo e a4-a7, o segundo.
+# check_collision devolve 1 em a0 quando há sobreposição e 0 quando não há.
 .data
 .eqv MAX_INIMIGOS   8
-.eqv TAM_INIMIGO    24   # bytes por inimigo (x, y, ativo, direcao, timer, tipo)
-.eqv TAM_PX_INIMIGO 32   # largura/altura do inimigo em pixels
+.eqv TAM_INIMIGO    24    # Bytes por inimigo (x, y, ativo, direção, timer, tipo)
+.eqv TAM_PX_INIMIGO 32    # Largura/altura do inimigo em pixels.
 .eqv TIPO_OLHO_COLISAO 2
 
-inimigos: .space 192     # MAX_INIMIGOS * TAM_INIMIGO
+inimigos: .space 192    # MAX_INIMIGOS * TAM_INIMIGO.
 
 .text
 
 # Colisão AABB: a0-a3 = x,y,largura,altura do objeto 1
-#               a4-a7 = x,y,largura,altura do objeto 2
-# retorna a0 = 1 se colidiu, 0 se não
+# a4-a7 = x,y,largura,altura do objeto 2
+# Retorno em a0: 1 se colidiu, 0 se não
 check_collision:
     add t0, a0, a2
     add t2, a1, a3
@@ -111,7 +113,7 @@ map_colision1:
     lw a2, 0(t0)
     mv a3, a2
 
-    # Carrega dados do poco 1
+    # Monta em a4-a7 o retângulo do primeiro poço de lava.
     li a4, 78
     li a5, 68
     li a6, 24
@@ -121,7 +123,7 @@ map_colision1:
     li t0, 1
     beq a0, t0, colidiu
 
-    # Carrega dados do poco 2
+    # Atualiza a4-a7 com o retângulo do segundo poço.
     la t0, posicao_x_mago
     lw a0, 0(t0)
     li a4, 208
@@ -131,7 +133,7 @@ map_colision1:
     li t0, 1
     beq a0, t0, colidiu
 
-    # Carrega dados do poco 3
+    # Atualiza a4-a7 com o retângulo do terceiro poço.
     la t0, posicao_x_mago
     lw a0, 0(t0)
     li a4, 208
@@ -141,7 +143,7 @@ map_colision1:
     li t0, 1
     beq a0, t0, colidiu
 
-    # Carrega dados do poco 4
+    # Atualiza a4-a7 com o retângulo do quarto poço.
     la t0, posicao_x_mago
     lw a0, 0(t0)
     li a4, 78
@@ -182,12 +184,12 @@ colidiu:
     jal mago_atingido
 
 map_colision_inimigo1:
-    j fim_after_move             # lava de inimigos agora e tratada no passo do ogro
+    j fim_after_move    # Lava de inimigos agora e tratada no passo do ogro.
     la   s3, inimigos
     li   s4, MAX_INIMIGOS
-    lw   t2, 8(s3)              # slot ativo?
+    lw   t2, 8(s3)    # Slot ativo?
     beqz t2, fim_colision
-    lw   t2, 20(s3)             # olhos voadores ignoram toda lava
+    lw   t2, 20(s3)    # Olhos voadores ignoram toda lava.
     li   t3, 2
     beq  t2, t3, fim_colision
     
@@ -265,8 +267,8 @@ map_colision_inimigo2:
     j fim_colision
 
 colidiuI:
-    lw t0, 20(s3)              # somente ogros morrem ao tocar lava
-    li t1, 2                    # tipo 2 = olho voador
+    lw t0, 20(s3)    # Somente ogros morrem ao tocar lava.
+    li t1, 2    # Tipo 2 = olho voador.
     beq t0, t1, fim_colision
     mv a0, s3
     jal mata_inimigo

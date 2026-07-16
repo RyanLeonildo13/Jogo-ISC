@@ -1,30 +1,30 @@
-#########################################################################
-# DefiniÁıe e Macros						v2.4	#
-# Marcus Vinicius Lamar							#
-# 2024/1								#
-#########################################################################
+# -----------------------------------------------------------------------------
+# Defini√ß√µes e Macros						v2.4
+# Marcus Vinicius Lamar
+# 2024/1
+# -----------------------------------------------------------------------------
 
-######### Verifica se eh a DE1-SoC ###############
+# --- Verifica se √© a DE1-SoC ---
 .macro DE1(%reg,%salto)
-	li %reg, 0x10008000	# carrega tp
-	bne gp, %reg, %salto	# Na DE1 gp = 0 ! N„o tem segmento .extern
+	li %reg, 0x10008000    # Carrega tp.
+	bne gp, %reg, %salto    # Na DE1 gp = 0 ! N√£o tem segmento .extern.
 .end_macro
 
-######### Verifica se tem ISA RV32IMF ###############
+# --- Verifica se tem ISA RV32IMF ---
 .macro TEM_F(%reg,%endereco)
 	csrr %reg, misa
 	andi %reg, %reg, 0x020
 	bnez %reg, %endereco
 .end_macro
 
-######### Verifica se n„o tem ISA RV32IMF ###############
+# --- Verifica se n√£o tem ISA RV32IMF ---
 .macro NAOTEM_F(%reg,%endereco)
 	csrr %reg, misa
 	andi %reg, %reg, 0x020
 	beqz %reg, %endereco
 .end_macro
 
-######### Verifica se tem ISA RV32IMF ou RV32IM ###############
+# --- Verifica se tem ISA RV32IMF ou RV32IM ---
 .macro TEM_M(%reg,%endereco)
 	csrr %reg, misa
 	srli %reg, %reg, 12
@@ -32,7 +32,7 @@
 	bnez %reg, %endereco
 .end_macro
 
-######### Verifica se n„o tem ISA RV32IMF ou RV32IM ###############
+# --- Verifica se n√£o tem ISA RV32IMF ou RV32IM ---
 .macro NAOTEM_M(%reg,%endereco)
 	csrr %reg, misa
 	srli %reg, %reg, 12
@@ -40,7 +40,7 @@
 	beqz %reg, %endereco
 .end_macro
 
-######### Macro para MultiplicaÁ„o na ISA RV32I ######################
+# --- Macro para Multiplica√ß√£o na ISA RV32I ---
 .macro MULTIPLY(%rd,%r1,%r2)
 		addi 	sp, sp, -12
 		sw	a0, 0(sp)
@@ -59,8 +59,8 @@
 		csrr	%rd,uscratch
 .end_macro
 
-######### Macro para Divis„o unsigned por 10 na ISA RV32I ######################
-### https://stackoverflow.com/questions/5558492/divide-by-10-using-bit-shifts
+# --- Macro para Divis√£o unsigned por 10 na ISA RV32I ---
+# https://stackoverflow.com/questions/5558492/divide-by-10-using-bit-shifts
 .macro DIVU10(%rd,%r1)
 		addi 	sp, sp, -16
 		sw	a0, 0(sp)
@@ -94,7 +94,7 @@
 	csrr	%rd,uscratch
 .end_macro
 
-######### Macro para Divis„o por 10 na ISA RV32I ######################
+# --- Macro para Divis√£o por 10 na ISA RV32I ---
 .macro DIV10(%rd,%r1)
 		addi 	sp,sp,-12
 		sw	a0,0(sp)
@@ -117,7 +117,7 @@ div10.pula2:	csrw	%rd,uscratch
 .end_macro		
 
 
-######### Macro para resto da divis„o por 10 unsigned na ISA RV32I ######################
+# --- Macro para resto da divis√£o por 10 unsigned na ISA RV32I ---
 .macro REMU10(%rd,%r1)
 		addi 	sp,sp,-16
 		sw	a0,0(sp)
@@ -140,7 +140,7 @@ div10.pula2:	csrw	%rd,uscratch
 		csrr	%rd,uscratch
 .end_macro
 
-######### Macro para resto da divis„o por 10 na ISA RV32I ######################
+# --- Macro para resto da divis√£o por 10 na ISA RV32I ---
 .macro REM10(%rd,%r1)
 		addi 	sp,sp,-16
 		sw	a0,0(sp)
@@ -164,7 +164,7 @@ div10.pula2:	csrw	%rd,uscratch
 .end_macro	
 			
 
-#definicao do mapa de enderecamento de MMIO
+# Defini√ß√£o do mapa de enderecamento de MMIO
 .eqv VGAADDRESSINI0     0xFF000000
 .eqv VGAADDRESSFIM0     0xFF012C00
 .eqv VGAADDRESSINI1     0xFF100000
@@ -217,4 +217,3 @@ div10.pula2:	csrw	%rd,uscratch
 .eqv InterHIGH		0xFF20070C
 
 .eqv FDIVIDER		0xFF200710
-

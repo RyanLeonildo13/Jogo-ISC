@@ -1,5 +1,7 @@
+# Neste m√≥dulo, a0-a3 levam argumentos de desenho ou atualiza√ß√£o do jogador.
+# Os registradores s preservam ponteiros e contadores durante os la√ßos do HUD.
 .data
-# Sprites dos coraÁıes (8x8, 1 byte/pixel RGB332, 0x00 = transparente)
+# Sprites dos cora√ß√µes (8x8, 1 byte/pixel RGB332, 0x00 = transparente)
 coracao_cheio:
     .word 8, 8, 0
     .byte 0x00,0x07,0x07,0x00,0x00,0x07,0x07,0x00
@@ -29,21 +31,21 @@ hud_vida_y:       .word 4
 hud_vida_espaco:  .word 9
 
 mana_maxima:      .word 100
-mana_atual:       .word 65        # valor de exemplo sÛ pra visualizaÁ„o
+mana_atual:       .word 65    # Valor de exemplo s√≥ para visualiza√ß√£o.
 hud_mana_x:       .word 4
 hud_mana_y:       .word 14
 hud_mana_largura: .word 26
 
-mago_spawn_x:     .word 24
-mago_spawn_y:     .word 20
+mago_spawn_x:     .word 148
+mago_spawn_y:     .word 180
 
 .text
 
 .eqv MANA_BAR_ALTURA 5
-.eqv MANA_COR        0xC0   # azul cheio (formato BBGGGRRR)
-.eqv MANA_COR_VAZIA  0x49   # trilho de fundo (azul escuro)
+.eqv MANA_COR        0xC0    # Azul cheio (formato BBGGGRRR)
+.eqv MANA_COR_VAZIA  0x49    # Trilho de fundo (azul escuro)
 
-# FunÁ„o da vida do player: desenha os coraÁıes do HUD
+# Desenha no HUD a quantidade atual de cora√ß√µes do jogador.
 draw_hearts:
     addi sp, sp, -16
     sw ra, 12(sp)
@@ -90,7 +92,7 @@ hearts_done:
     ret
 
 # Desenha um sprite 8x8, 1 byte/pixel, 0x00 = transparente
-# a0 = sprite (com cabeÁalho), a1 = x, a2 = y
+# a0 = sprite (com cabe√ßalho), a1 = x, a2 = y
 draw_sprite8x8:
     la t0, base_frame_A
     lw s0, 0(t0)
@@ -125,7 +127,7 @@ sprite_col_done:
 sprite_row_done:
     ret
 
-# FunÁ„o da mana do player: desenha a barra de mana (preenche proporcional)
+# Desenha a barra de mana com preenchimento proporcional ao valor atual.
 draw_mana_bar:
     addi sp, sp, -12
     sw s1, 8(sp)
@@ -142,7 +144,7 @@ draw_mana_bar:
     la t0, hud_mana_largura
     lw s3, 0(t0)
     mul s1, s1, s3
-    div s1, s1, s2          # s1 = largura preenchida (px)
+    div s1, s1, s2    # S1 = largura preenchida (px)
 
     la t0, hud_mana_x
     lw a1, 0(t0)
@@ -183,7 +185,7 @@ mana_row_done:
     addi sp, sp, 12
     ret
 
-# Adiciona mana (a0 = quantidade), sem passar do m·ximo
+# Adiciona mana (a0 = quantidade), sem passar do m√°ximo
 ganha_mana:
     la t0, mana_atual
     lw t1, 0(t0)
@@ -197,7 +199,7 @@ mana_no_teto:
     sw t3, 0(t0)
     ret
 
-# FunÁ„o de dano do player: aplica hit, mata inimigos da tela e reinicia
+# Aplica o dano ao jogador e decide entre reiniciar a posi√ß√£o ou encerrar a partida.
 mago_atingido:
     addi sp, sp, -4
     sw ra, 0(sp)
@@ -206,7 +208,7 @@ mago_atingido:
     bgtz t0, mago_sem_dano
     la t0, vida_atual
     lw t1, 0(t0)
-    addi t1, t1, -1          # todo contato tira um coracao inteiro
+    addi t1, t1, -1    # t1 passa a guardar uma vida a menos ap√≥s o contato.
     sw t1, 0(t0)
     blez t1, game_over
     jal tocar_ataque_async
@@ -239,8 +241,8 @@ mago_sem_dano:
     ret
 
 game_over:
-    jal tocar_som_mago_morre   # morte: efeito proprio, grave e mais longo
-    la t0, game_over_flag       # sinaliza game over; a tela e mostrada no loop
+    jal tocar_som_mago_morre    # Na morte, usa um efeito pr√≥prio, mais grave e prolongado.
+    la t0, game_over_flag    # t0 recebe o endere√ßo da flag lida pelo la√ßo principal.
     li t1, 1
     sw t1, 0(t0)
     lw ra, 0(sp)
